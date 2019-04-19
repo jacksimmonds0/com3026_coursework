@@ -7,10 +7,15 @@ import java.net.InetAddress;
 
 public class MessageReceiver implements Runnable
 {
+    private static final int BUFFER_SIZE = 1024;
+
+    private MessageSender sender;
+
     private int port;
 
-    public MessageReceiver(int port)
+    public MessageReceiver(MessageSender sender, int port)
     {
+        this.sender = sender;
         this.port = port;
     }
 
@@ -23,19 +28,21 @@ public class MessageReceiver implements Runnable
 
             while(true)
             {
-                byte[] buffer = new byte[1024];
-                byte[] sendData = new byte[8];
-
+                byte[] buffer = new byte[BUFFER_SIZE];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-                String message = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                System.out.println("RECEIVED: " + message);
 
-//                InetAddress IPAddress = packet.getAddress();
-//                String sendString = "polo";
-//                sendData = sendString.getBytes();
-//                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-//                socket.send(sendPacket);
+                String message = new String(packet.getData(), packet.getOffset(), packet.getLength());
+                System.out.println(message);
+
+                // handle based on message
+                // send a message to the joiner with info on all current members
+                if(message.startsWith("joiner"))
+                {
+                    InetAddress address = InetAddress.getByName("127.0.0.1");
+                    int port = 8002;
+                    sender.sendMessageAllMembers(address, port);
+                }
             }
         }
         catch (IOException e){

@@ -5,16 +5,19 @@ import java.net.UnknownHostException;
 
 public class Member
 {
-    private int id;
+    private static final String LOCALHOST = "127.0.0.1";
 
-    private InetAddress ipAddress;
+    protected int id;
 
-    private int portNumber;
+    protected InetAddress ipAddress;
+
+    protected int portNumber;
 
     public Member(int id, int portNumber) throws UnknownHostException
     {
         this.id = id;
-        this.ipAddress = InetAddress.getLocalHost();
+        // for the purposes of this implementation, IP address limited to localhost
+        this.ipAddress = InetAddress.getByName(LOCALHOST);
         this.portNumber = portNumber;
     }
 
@@ -31,5 +34,14 @@ public class Member
     public int getPortNumber()
     {
         return portNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                 "id=" + id +
+                ", ipAddress=" + ipAddress.getHostAddress() +
+                ", portNumber=" + portNumber +
+                '}';
     }
 }

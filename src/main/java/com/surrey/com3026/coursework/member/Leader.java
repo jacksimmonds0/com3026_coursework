@@ -8,4 +8,14 @@ public class Leader extends Member {
     {
         super(id, portNumber);
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", ipAddress=" + ipAddress.getHostAddress() +
+                ", portNumber=" + portNumber +
+                ", isLeader=true" +
+                '}';
+    }
 }

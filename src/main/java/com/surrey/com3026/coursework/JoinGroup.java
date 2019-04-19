@@ -2,6 +2,7 @@ package com.surrey.com3026.coursework;
 
 import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
+import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.MessageReceiver;
 import com.surrey.com3026.coursework.message.MessageSender;
 
@@ -17,31 +18,37 @@ public class JoinGroup
         {
             int id = Integer.parseInt(args[0]);
             int portNumber = Integer.parseInt(args[1]);
-            InetAddress localAddress = InetAddress.getLocalHost();
+
+            Members members = new Members();
+            MessageSender sender = new MessageSender(members);
 
             // initialise to retrieve UDP messages on this node
-            MessageReceiver receiver = new MessageReceiver(portNumber);
+            MessageReceiver receiver = new MessageReceiver(sender, portNumber);
             new Thread(receiver).start();
 
             if(args.length == 2)
             {
-                Member member = new Leader(id, portNumber);
+                Member leader = new Leader(id, portNumber);
                 System.out.println("Leader created");
+
+                members.addMember(leader);
             }
             else
             {
                 Member member = new Member(id, portNumber);
+                members.addMember(member);
 
                 // use previous member to retrieve all current members list to update
                 String[] prevMember = args[2].split(":");
-                InetAddress prevIp = InetAddress.getByName(prevMember[0]);
+                InetAddress prevAddress = InetAddress.getByName(prevMember[0]);
                 int prevPort = Integer.parseInt(prevMember[1]);
 
-                MessageSender sender = new MessageSender();
-                sender.sendMessage(prevIp, prevPort, "I love the leader!");
+                sender.sendJoinerMessage(member, prevAddress, prevPort);
             }
 
-        } catch (UnknownHostException e) {
+        }
+        catch (UnknownHostException e)
+        {
             e.printStackTrace();
         }
     }
