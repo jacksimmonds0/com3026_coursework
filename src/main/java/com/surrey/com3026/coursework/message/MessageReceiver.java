@@ -19,22 +19,23 @@ public class MessageReceiver implements Runnable
     {
         try
         {
-            DatagramSocket serverSocket = new DatagramSocket(port);
-            byte[] receiveData = new byte[8];
-            byte[] sendData = new byte[8];
+            DatagramSocket socket = new DatagramSocket(port);
 
             while(true)
             {
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                serverSocket.receive(receivePacket);
-                String sentence = new String( receivePacket.getData());
-                System.out.println("RECEIVED: " + sentence);
+                byte[] buffer = new byte[1024];
+                byte[] sendData = new byte[8];
 
-//                InetAddress IPAddress = receivePacket.getAddress();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                socket.receive(packet);
+                String message = new String(packet.getData(), packet.getOffset(), packet.getLength());
+                System.out.println("RECEIVED: " + message);
+
+//                InetAddress IPAddress = packet.getAddress();
 //                String sendString = "polo";
 //                sendData = sendString.getBytes();
 //                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-//                serverSocket.send(sendPacket);
+//                socket.send(sendPacket);
             }
         }
         catch (IOException e){

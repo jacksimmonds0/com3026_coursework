@@ -20,7 +20,6 @@ public class MessageSender
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
             datagramSocket.send(packet);
-            System.out.println(InetAddress.getLocalHost().getHostAddress());
         }
         catch (IOException e)
         {
