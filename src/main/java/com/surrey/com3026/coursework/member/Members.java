@@ -1,7 +1,6 @@
 package com.surrey.com3026.coursework.member;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Members
@@ -12,12 +11,6 @@ public class Members
     {
         super();
         this.members = new ArrayList<>();
-    }
-
-
-    public Members(Member... members)
-    {
-        this(Arrays.asList(members));
     }
 
     public Members(List<Member> members)
@@ -31,9 +24,14 @@ public class Members
         this.members.add(member);
     }
 
-    public void addMembers(Member... members)
+    public List<Member> getMembers()
     {
-        this.members.addAll(Arrays.asList(members));
+        return members;
+    }
+
+    public void setMembers(List<Member> members)
+    {
+        this.members = members;
     }
 
     @Override

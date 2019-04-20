@@ -19,32 +19,33 @@ public class JoinGroup
             int id = Integer.parseInt(args[0]);
             int portNumber = Integer.parseInt(args[1]);
 
+            // instantiate the object holding the current list of members in the group
             Members members = new Members();
+            Member thisNode = null;
             MessageSender sender = new MessageSender(members);
 
-            // initialise to retrieve UDP messages on this node
-            MessageReceiver receiver = new MessageReceiver(sender, portNumber);
+            // initialise to receive UDP messages on this node
+            MessageReceiver receiver = new MessageReceiver(sender, members, portNumber);
             new Thread(receiver).start();
 
             if(args.length == 2)
             {
-                Member leader = new Leader(id, portNumber);
+                thisNode = new Leader(id, portNumber);
                 System.out.println("Leader created");
-
-                members.addMember(leader);
             }
             else
             {
-                Member member = new Member(id, portNumber);
-                members.addMember(member);
+                thisNode = new Member(id, portNumber);
 
                 // use previous member to retrieve all current members list to update
                 String[] prevMember = args[2].split(":");
                 InetAddress prevAddress = InetAddress.getByName(prevMember[0]);
                 int prevPort = Integer.parseInt(prevMember[1]);
 
-                sender.sendJoinerMessage(member, prevAddress, prevPort);
+                sender.sendJoinerRequest(thisNode, prevAddress, prevPort);
             }
+            members.addMember(thisNode);
+            sender.setThisNode(thisNode);
 
         }
         catch (UnknownHostException e)

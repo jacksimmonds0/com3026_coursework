@@ -2,22 +2,32 @@ package com.surrey.com3026.coursework.member;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import javax.xml.bind.annotation.*;
 
+@XmlRootElement
+@XmlSeeAlso(Leader.class)
 public class Member
 {
     private static final String LOCALHOST = "127.0.0.1";
 
+    @XmlAttribute
     protected int id;
 
-    protected InetAddress ipAddress;
+    @XmlElement
+    protected String ipAddress;
 
+    @XmlElement
     protected int portNumber;
 
-    public Member(int id, int portNumber) throws UnknownHostException
+    public Member()
+    {
+    }
+
+    public Member(int id, int portNumber)
     {
         this.id = id;
         // for the purposes of this implementation, IP address limited to localhost
-        this.ipAddress = InetAddress.getByName(LOCALHOST);
+        this.ipAddress = LOCALHOST;
         this.portNumber = portNumber;
     }
 
@@ -26,7 +36,12 @@ public class Member
         return id;
     }
 
-    public InetAddress getIpAddress()
+    public InetAddress getIp() throws UnknownHostException
+    {
+        return InetAddress.getByName(ipAddress);
+    }
+
+    public String getIpAddress()
     {
         return ipAddress;
     }
@@ -40,8 +55,22 @@ public class Member
     public String toString() {
         return "{" +
                  "id=" + id +
-                ", ipAddress=" + ipAddress.getHostAddress() +
+                ", ipAddress=" + ipAddress +
                 ", portNumber=" + portNumber +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this)
+        {
+            return true;
+        }
+        else if(!(obj instanceof Member))
+        {
+            return false;
+        }
+
+        return id == ((Member) obj).getId();
     }
 }
