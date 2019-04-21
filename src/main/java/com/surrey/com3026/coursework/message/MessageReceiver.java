@@ -33,8 +33,6 @@ public class MessageReceiver implements Runnable
 
     private Member thisNode;
 
-    private long timeMembersCheckStart = 0;
-
     private List<Member> membersToCheckAccepted = Collections.synchronizedList(new ArrayList<>());
 
     public MessageReceiver(Members members, DatagramSocket socket)
@@ -51,17 +49,6 @@ public class MessageReceiver implements Runnable
             // continuous loop, always need to listen for messages while the node is still running
             while(true)
             {
-
-                if (timeMembersCheckStart != 0)
-                {
-                    long elapsed = System.currentTimeMillis() - timeMembersCheckStart;
-                    if (elapsed > 10000)
-                    {
-                        // members not responding
-                        System.out.println("MEMBERS NOT RESPONDING");
-                        System.out.println(membersToCheckAccepted.toString());
-                    }
-                }
 
                 byte[] buffer = new byte[BUFFER_SIZE];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -145,11 +132,7 @@ public class MessageReceiver implements Runnable
             System.out.println("MEMBER HAS ACCEPTED ME");
             System.out.println("------------------------");
             System.out.println(message.getResponder().toString());
-
-            System.out.println(membersToCheckAccepted.toString());
             this.removeMemberAccepted(message.getResponder());
-            System.out.println(membersToCheckAccepted.toString());
-
             System.out.println("------------------------");
         }
     }
@@ -161,9 +144,9 @@ public class MessageReceiver implements Runnable
         this.thisNode = thisNode;
     }
 
-    public void setTimeMembersCheckStart(long timeMembersCheckStart)
+    public List<Member> getMembersToCheckAccepted()
     {
-        this.timeMembersCheckStart = timeMembersCheckStart;
+        return membersToCheckAccepted;
     }
 
     public void setMembersToCheckAccepted(List<Member> membersToCheckAccepted)

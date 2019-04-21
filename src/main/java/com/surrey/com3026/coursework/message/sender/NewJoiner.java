@@ -5,6 +5,7 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.MessageReceiver;
 import com.surrey.com3026.coursework.message.MessageTypes;
+import com.surrey.com3026.coursework.message.checker.MembersResponseChecker;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -38,8 +39,7 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
             return;
         }
 
-        this.receiver.setTimeMembersCheckStart(System.currentTimeMillis());
-        this.receiver.setMembersToCheckAccepted(membersToMessage);
+        receiver.setMembersToCheckAccepted(membersToMessage);
 
         Message message = new Message(MessageTypes.NEW_JOINER, thisNode);
         for(Member m : membersToMessage)
@@ -56,5 +56,9 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
 
             super.sendMessage(mAddress, m.getPortNumber(), message);
         }
+
+        // add listener to ensure all members are responding
+        MembersResponseChecker checker = new MembersResponseChecker(receiver);
+        new Thread(checker).start();
     }
 }
