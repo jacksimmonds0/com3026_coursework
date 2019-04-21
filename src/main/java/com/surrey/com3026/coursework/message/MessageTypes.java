@@ -8,4 +8,6 @@ public interface MessageTypes
 
     public static final String NEW_JOINER = "new_joiner";
 
+    public static final String ACCEPT_JOINER = "accept_joiner";
+
 }

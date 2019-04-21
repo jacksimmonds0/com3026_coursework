@@ -22,6 +22,12 @@ public class Message {
     {
     }
 
+    public Message(String type, Member responder)
+    {
+        this.type = type;
+        this.responder = responder;
+    }
+
     public Message(String type, List<Member> members)
     {
         this.type = type;
@@ -48,5 +54,10 @@ public class Message {
     public Member getResponder()
     {
         return responder;
+    }
+
+    @Override
+    public String toString() {
+        return type;
     }
 }

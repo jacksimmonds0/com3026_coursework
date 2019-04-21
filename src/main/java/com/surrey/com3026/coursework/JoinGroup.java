@@ -4,10 +4,12 @@ import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.MessageReceiver;
-import com.surrey.com3026.coursework.message.MessageSender;
+import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
+import com.surrey.com3026.coursework.message.sender.JoinRequest;
 
+import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class JoinGroup
 {
@@ -22,10 +24,12 @@ public class JoinGroup
             // instantiate the object holding the current list of members in the group
             Members members = new Members();
             Member thisNode = null;
-            MessageSender sender = new MessageSender(members);
+
+            // create the message sender to send messages (e.g. a new joiner request)
+            DatagramSocket socket = new DatagramSocket(portNumber);
 
             // initialise to receive UDP messages on this node
-            MessageReceiver receiver = new MessageReceiver(sender, members, portNumber);
+            MessageReceiver receiver = new MessageReceiver(members, socket);
             new Thread(receiver).start();
 
             if(args.length == 2)
@@ -42,13 +46,13 @@ public class JoinGroup
                 InetAddress prevAddress = InetAddress.getByName(prevMember[0]);
                 int prevPort = Integer.parseInt(prevMember[1]);
 
-                sender.sendJoinerRequest(thisNode, prevAddress, prevPort);
+                JoinRequest sender = new JoinRequest(members, prevAddress, prevPort, thisNode);
+                new Thread(sender).start();
             }
             members.addMember(thisNode);
-            sender.setThisNode(thisNode);
-
+            receiver.setThisNode(thisNode);
         }
-        catch (UnknownHostException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
