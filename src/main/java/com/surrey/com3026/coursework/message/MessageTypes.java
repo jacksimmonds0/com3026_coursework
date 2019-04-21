@@ -10,4 +10,6 @@ public interface MessageTypes
 
     public static final String ACCEPT_JOINER = "accept_joiner";
 
+    public static final String UPDATE_MEMBERS = "update_members";
+
 }

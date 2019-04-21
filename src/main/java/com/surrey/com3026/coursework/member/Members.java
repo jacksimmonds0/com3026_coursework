@@ -3,6 +3,9 @@ package com.surrey.com3026.coursework.member;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class holding information on the current members in the group network
+ */
 public class Members
 {
     private List<Member> members;
@@ -32,6 +35,14 @@ public class Members
     public void setMembers(List<Member> members)
     {
         this.members = members;
+    }
+
+    public void removeMembers(List<Member> membersToRemove)
+    {
+        for(Member member : membersToRemove)
+        {
+            this.members.remove(member);
+        }
     }
 
     @Override

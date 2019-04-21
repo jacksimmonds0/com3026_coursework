@@ -42,23 +42,10 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
         receiver.setMembersToCheckAccepted(membersToMessage);
 
         Message message = new Message(MessageTypes.NEW_JOINER, thisNode);
-        for(Member m : membersToMessage)
-        {
-            InetAddress mAddress = null;
-            try
-            {
-                mAddress = m.getIp();
-            }
-            catch (UnknownHostException e)
-            {
-                e.printStackTrace();
-            }
-
-            super.sendMessage(mAddress, m.getPortNumber(), message);
-        }
+        sendMessageToMultipleMembers(message, membersToMessage);
 
         // add listener to ensure all members are responding
-        MembersResponseChecker checker = new MembersResponseChecker(receiver);
+        MembersResponseChecker checker = new MembersResponseChecker(receiver, members, thisNode);
         new Thread(checker).start();
     }
 }

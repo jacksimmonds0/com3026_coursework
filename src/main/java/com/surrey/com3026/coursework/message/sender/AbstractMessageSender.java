@@ -12,7 +12,9 @@ import java.io.StringWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Timestamp;
+import java.util.List;
 
 public abstract class AbstractMessageSender
 {
@@ -80,5 +82,23 @@ public abstract class AbstractMessageSender
         }
 
         return messageString;
+    }
+
+    protected void sendMessageToMultipleMembers(Message message, List<Member> membersToMessage)
+    {
+        for(Member m : membersToMessage)
+        {
+            InetAddress mAddress = null;
+            try
+            {
+                mAddress = m.getIp();
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+            }
+
+            sendMessage(mAddress, m.getPortNumber(), message);
+        }
     }
 }

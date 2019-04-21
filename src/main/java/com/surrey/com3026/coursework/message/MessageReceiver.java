@@ -135,6 +135,17 @@ public class MessageReceiver implements Runnable
             this.removeMemberAccepted(message.getResponder());
             System.out.println("------------------------");
         }
+        else if (message.getType().equals(MessageTypes.UPDATE_MEMBERS))
+        {
+            System.out.println("UPDATING MEMBERS");
+            System.out.println("------------------------");
+            System.out.println(message.getMembers().toString());
+            System.out.println("------------------------");
+
+            // updating the members list to the current members
+            // due to some not responding
+            members.setMembers(message.getMembers());
+        }
     }
 
 
