@@ -2,7 +2,10 @@ package com.surrey.com3026.coursework.member;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlRootElement
 @XmlSeeAlso(Leader.class)
@@ -61,7 +64,8 @@ public class Member
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if(obj == this)
         {
             return true;

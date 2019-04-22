@@ -1,5 +1,6 @@
 package com.surrey.com3026.coursework.message.checker;
 
+import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
@@ -29,12 +30,16 @@ public class MembersResponseChecker implements Runnable
 
     private DatagramSocket socket;
 
-    public MembersResponseChecker(MessageReceiver receiver, Members members, Member thisNode, DatagramSocket socket)
+    private LeaderElection election;
+
+    public MembersResponseChecker(MessageReceiver receiver, Members members, Member thisNode,
+                                  DatagramSocket socket, LeaderElection election)
     {
         this.receiver = receiver;
         this.members = members;
         this.thisNode = thisNode;
         this.socket = socket;
+        this.election = election;
     }
 
     @Override
@@ -68,6 +73,7 @@ public class MembersResponseChecker implements Runnable
                             if (!anyLeader.isEmpty())
                             {
                                 // trigger leader election here
+                                election.initiate();
                             }
 
                         }

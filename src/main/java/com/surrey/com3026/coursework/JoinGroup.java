@@ -1,5 +1,7 @@
 package com.surrey.com3026.coursework;
 
+import com.surrey.com3026.coursework.election.BullyLeaderElection;
+import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
@@ -24,13 +26,6 @@ public class JoinGroup
             Members members = new Members();
             Member thisNode = null;
 
-            // create the message sender to send messages (e.g. a new joiner request)
-            DatagramSocket socket = new DatagramSocket(portNumber);
-
-            // initialise to receive UDP messages on this node
-            MessageReceiver receiver = new MessageReceiver(members, socket);
-            new Thread(receiver).start();
-
             if(args.length == 2)
             {
                 thisNode = new Leader(id, portNumber);
@@ -40,6 +35,21 @@ public class JoinGroup
             {
                 thisNode = new Member(id, portNumber);
 
+            }
+            members.addMember(thisNode);
+
+            // create the message sender to send messages (e.g. a new joiner request)
+            DatagramSocket socket = new DatagramSocket(portNumber);
+
+            // decide on leader election implementation
+            LeaderElection election = new BullyLeaderElection(members, thisNode, socket);
+
+            // initialise to receive UDP messages on this node
+            MessageReceiver receiver = new MessageReceiver(members, thisNode, socket, election);
+            new Thread(receiver).start();
+
+            if (!(thisNode instanceof Leader))
+            {
                 // use previous member to retrieve all current members list to update
                 String[] prevMember = args[2].split(":");
                 InetAddress prevAddress = InetAddress.getByName(prevMember[0]);
@@ -48,8 +58,7 @@ public class JoinGroup
                 JoinRequest sender = new JoinRequest(members, prevAddress, prevPort, thisNode, socket);
                 new Thread(sender).start();
             }
-            members.addMember(thisNode);
-            receiver.setThisNode(thisNode);
+
         }
         catch (IOException e)
         {

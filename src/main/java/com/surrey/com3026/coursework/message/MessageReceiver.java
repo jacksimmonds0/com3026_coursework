@@ -1,5 +1,6 @@
 package com.surrey.com3026.coursework.message;
 
+import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.sender.AcceptJoiner;
@@ -20,8 +21,7 @@ import java.util.List;
 
 
 /**
- * Class to listen for messages for new joiner requests, and updating members with a new joiner
- *
+ * Class to listen for messages from other nodes that have joined or are trying to join the group
  */
 public class MessageReceiver implements Runnable
 {
@@ -31,14 +31,18 @@ public class MessageReceiver implements Runnable
 
     private DatagramSocket socket;
 
+    private LeaderElection election;
+
     private Member thisNode;
 
     private List<Member> membersToCheckAccepted = Collections.synchronizedList(new ArrayList<>());
 
-    public MessageReceiver(Members members, DatagramSocket socket)
+    public MessageReceiver(Members members, Member thisNode, DatagramSocket socket, LeaderElection election)
     {
         this.members = members;
+        this.thisNode = thisNode;
         this.socket = socket;
+        this.election = election;
     }
 
     @Override
@@ -123,7 +127,8 @@ public class MessageReceiver implements Runnable
             // except this node and the node we just got the all_members message from
             if (message.getResponder() != null)
             {
-                NewJoiner sender = new NewJoiner(members, thisNode, socket, message.getResponder(), this);
+                NewJoiner sender = new NewJoiner(members, thisNode, socket, message.getResponder(),
+                        this, election);
                 new Thread(sender).start();
             }
         }
@@ -145,6 +150,10 @@ public class MessageReceiver implements Runnable
             // updating the members list to the current members
             // due to some not responding
             members.setMembers(message.getMembers());
+        }
+        else if (election.isElectionMessage(message.getType()))
+        {
+            election.handleElectionMessage(message);
         }
     }
 

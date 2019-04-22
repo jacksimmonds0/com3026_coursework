@@ -1,5 +1,6 @@
 package com.surrey.com3026.coursework.message.sender;
 
+import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
@@ -17,11 +18,15 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
 
     private MessageReceiver receiver;
 
-    public NewJoiner(Members members, Member thisNode, DatagramSocket socket, Member responder, MessageReceiver receiver)
+    private LeaderElection election;
+
+    public NewJoiner(Members members, Member thisNode, DatagramSocket socket, Member responder,
+                     MessageReceiver receiver, LeaderElection election)
     {
         super(members, thisNode, socket);
         this.responder = responder;
         this.receiver = receiver;
+        this.election = election;
     }
 
     @Override
@@ -44,7 +49,9 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
         sendMessageToMultipleMembers(message, membersToMessage);
 
         // add listener to ensure all members are responding
-        MembersResponseChecker checker = new MembersResponseChecker(receiver, members, thisNode, socket);
+        MembersResponseChecker checker = new MembersResponseChecker(receiver, members, thisNode, socket, election);
         new Thread(checker).start();
     }
+
+
 }

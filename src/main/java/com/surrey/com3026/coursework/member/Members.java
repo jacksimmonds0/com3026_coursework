@@ -45,6 +45,11 @@ public class Members
         }
     }
 
+    public void replaceMember(int index, Member replacer)
+    {
+        members.set(index, replacer);
+    }
+
     @Override
     public String toString()
     {
