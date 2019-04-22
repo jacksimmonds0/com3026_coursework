@@ -5,14 +5,15 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.MessageTypes;
 
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class SendAllCurrentMembers extends AbstractMessageSender implements Runnable
 {
 
-    public SendAllCurrentMembers(Members members, InetAddress address, int port, Member thisNode)
+    public SendAllCurrentMembers(Members members, InetAddress address, int port, Member thisNode, DatagramSocket socket)
     {
-        super(members, address, port, thisNode);
+        super(members, address, port, thisNode, socket);
     }
 
     @Override

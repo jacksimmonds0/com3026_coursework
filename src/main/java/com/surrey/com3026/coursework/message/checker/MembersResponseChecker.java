@@ -6,6 +6,7 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.MessageReceiver;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 
+import java.net.DatagramSocket;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,11 +27,14 @@ public class MembersResponseChecker implements Runnable
 
     private Member thisNode;
 
-    public MembersResponseChecker(MessageReceiver receiver, Members members, Member thisNode)
+    private DatagramSocket socket;
+
+    public MembersResponseChecker(MessageReceiver receiver, Members members, Member thisNode, DatagramSocket socket)
     {
         this.receiver = receiver;
         this.members = members;
         this.thisNode = thisNode;
+        this.socket = socket;
     }
 
     @Override
@@ -47,18 +51,21 @@ public class MembersResponseChecker implements Runnable
                         if (!remaining.isEmpty())
                         {
                             System.out.println("MEMBERS NOT RESPONDING");
+                            System.out.println("-------------------------------");
+                            remaining.forEach(System.out::println);
+                            System.out.println("-------------------------------");
 
                             // send updated list to all other members
                             members.removeMembers(remaining);
-                            UpdateMembers sender = new UpdateMembers(members, thisNode);
-                            new Thread(sender).start();;
+                            UpdateMembers sender = new UpdateMembers(members, thisNode, socket);
+                            new Thread(sender).start();
 
                             // see if any of the non-responsive previous members was the leader/coordinator
                             List<Member> anyLeader = remaining.stream()
                                     .filter(member -> member instanceof Leader)
                                     .collect(Collectors.toList());
 
-                            if(!anyLeader.isEmpty())
+                            if (!anyLeader.isEmpty())
                             {
                                 // trigger leader election here
                             }

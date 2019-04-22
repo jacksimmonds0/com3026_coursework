@@ -89,7 +89,7 @@ public class MessageReceiver implements Runnable
 
 
             SendAllCurrentMembers sender = new SendAllCurrentMembers(members, newJoiner.getIp(),
-                    newJoiner.getPortNumber(), thisNode);
+                    newJoiner.getPortNumber(), thisNode, socket);
             new Thread(sender).start();
         }
         else if (message.getType().equals(MessageTypes.NEW_JOINER))
@@ -106,7 +106,7 @@ public class MessageReceiver implements Runnable
             // send accept_joiner
             // need to check that all these accepted messages are received
             AcceptJoiner sender = new AcceptJoiner(members, newJoiner.getIp(),
-                    newJoiner.getPortNumber(), thisNode);
+                    newJoiner.getPortNumber(), thisNode, socket);
             new Thread(sender).start();
         }
         else if (message.getType().equals(MessageTypes.ALL_CURRENT_MEMBERS))
@@ -123,7 +123,7 @@ public class MessageReceiver implements Runnable
             // except this node and the node we just got the all_members message from
             if (message.getResponder() != null)
             {
-                NewJoiner sender = new NewJoiner(members, thisNode, message.getResponder(), this);
+                NewJoiner sender = new NewJoiner(members, thisNode, socket, message.getResponder(), this);
                 new Thread(sender).start();
             }
         }
@@ -147,7 +147,6 @@ public class MessageReceiver implements Runnable
             members.setMembers(message.getMembers());
         }
     }
-
 
 
     public void setThisNode(Member thisNode)

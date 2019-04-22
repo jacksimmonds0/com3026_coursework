@@ -4,7 +4,6 @@ import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.MessageReceiver;
-import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
 import com.surrey.com3026.coursework.message.sender.JoinRequest;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class JoinGroup
                 InetAddress prevAddress = InetAddress.getByName(prevMember[0]);
                 int prevPort = Integer.parseInt(prevMember[1]);
 
-                JoinRequest sender = new JoinRequest(members, prevAddress, prevPort, thisNode);
+                JoinRequest sender = new JoinRequest(members, prevAddress, prevPort, thisNode, socket);
                 new Thread(sender).start();
             }
             members.addMember(thisNode);

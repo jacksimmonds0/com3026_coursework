@@ -7,8 +7,7 @@ import com.surrey.com3026.coursework.message.MessageReceiver;
 import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.checker.MembersResponseChecker;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +17,9 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
 
     private MessageReceiver receiver;
 
-    public NewJoiner(Members members, Member thisNode, Member responder, MessageReceiver receiver)
+    public NewJoiner(Members members, Member thisNode, DatagramSocket socket, Member responder, MessageReceiver receiver)
     {
-        super(members, thisNode);
+        super(members, thisNode, socket);
         this.responder = responder;
         this.receiver = receiver;
     }
@@ -45,7 +44,7 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
         sendMessageToMultipleMembers(message, membersToMessage);
 
         // add listener to ensure all members are responding
-        MembersResponseChecker checker = new MembersResponseChecker(receiver, members, thisNode);
+        MembersResponseChecker checker = new MembersResponseChecker(receiver, members, thisNode, socket);
         new Thread(checker).start();
     }
 }

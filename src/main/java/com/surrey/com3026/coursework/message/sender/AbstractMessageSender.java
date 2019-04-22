@@ -13,7 +13,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractMessageSender
@@ -26,18 +26,22 @@ public abstract class AbstractMessageSender
 
     protected Member thisNode;
 
-    public AbstractMessageSender(Members members, Member thisNode)
+    protected DatagramSocket socket;
+
+    public AbstractMessageSender(Members members, Member thisNode, DatagramSocket socket)
     {
         this.members = members;
         this.thisNode = thisNode;
+        this.socket = socket;
     }
 
-    public AbstractMessageSender(Members members, InetAddress address, int port, Member thisNode)
+    public AbstractMessageSender(Members members, InetAddress address, int port, Member thisNode, DatagramSocket socket)
     {
         this.members = members;
         this.address = address;
         this.port = port;
         this.thisNode = thisNode;
+        this.socket = socket;
     }
 
 
@@ -52,7 +56,7 @@ public abstract class AbstractMessageSender
         );
 
         // creating socket for request/response
-        try(DatagramSocket socket = new DatagramSocket();)
+        try
         {
             socket.send(packet);
         }
@@ -101,4 +105,14 @@ public abstract class AbstractMessageSender
             sendMessage(mAddress, m.getPortNumber(), message);
         }
     }
+
+    protected void broadcastMessage(Message message)
+    {
+        // broadcasting a message to all other members, so exclude this node
+        List<Member> membersToMessage = new ArrayList<>(members.getMembers());
+        membersToMessage.remove(thisNode);
+
+        this.sendMessageToMultipleMembers(message, membersToMessage);
+    }
+
 }
