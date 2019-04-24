@@ -4,7 +4,7 @@ import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
-import com.surrey.com3026.coursework.message.MessageReceiver;
+import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 
 import java.net.DatagramSocket;
@@ -22,7 +22,7 @@ public class MembersResponseChecker implements Runnable
 {
     private static final int TIMEOUT = 5 * 1000;
 
-    private MessageReceiver receiver;
+    private MessageConsumer consumer;
 
     private Members members;
 
@@ -32,10 +32,10 @@ public class MembersResponseChecker implements Runnable
 
     private LeaderElection election;
 
-    public MembersResponseChecker(MessageReceiver receiver, Members members, Member thisNode,
+    public MembersResponseChecker(MessageConsumer consumer, Members members, Member thisNode,
                                   DatagramSocket socket, LeaderElection election)
     {
-        this.receiver = receiver;
+        this.consumer = consumer;
         this.members = members;
         this.thisNode = thisNode;
         this.socket = socket;
@@ -52,7 +52,7 @@ public class MembersResponseChecker implements Runnable
                     @Override
                     public void run()
                     {
-                        List<Member> remaining = receiver.getMembersToCheckAccepted();
+                        List<Member> remaining = consumer.getMembersToCheckAccepted();
                         if (!remaining.isEmpty())
                         {
                             System.out.println("MEMBERS NOT RESPONDING");
@@ -70,8 +70,10 @@ public class MembersResponseChecker implements Runnable
                                     .filter(member -> member instanceof Leader)
                                     .collect(Collectors.toList());
 
+                            System.out.println(remaining.toString());
                             if (!anyLeader.isEmpty())
                             {
+                                System.out.println("Starting leader election");
                                 // trigger leader election here
                                 election.initiate();
                             }

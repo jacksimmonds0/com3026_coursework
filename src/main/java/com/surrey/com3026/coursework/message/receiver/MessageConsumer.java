@@ -1,31 +1,28 @@
-package com.surrey.com3026.coursework.message;
+package com.surrey.com3026.coursework.message.receiver;
 
 import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
+import com.surrey.com3026.coursework.message.Message;
+import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.sender.AcceptJoiner;
 import com.surrey.com3026.coursework.message.sender.NewJoiner;
 import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
-import java.io.StringReader;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.concurrent.BlockingQueue;
 
 /**
- * Class to listen for messages from other nodes that have joined or are trying to join the group
+ * Class that runs on a thread to consume messages placed on the blocking message queue by the {@link MessageReceiver}
  */
-public class MessageReceiver implements Runnable
+public class MessageConsumer implements Runnable
 {
-    private static final int BUFFER_SIZE = 1024;
+    private BlockingQueue messageQueue;
 
     private Members members;
 
@@ -37,12 +34,28 @@ public class MessageReceiver implements Runnable
 
     private List<Member> membersToCheckAccepted = Collections.synchronizedList(new ArrayList<>());
 
-    public MessageReceiver(Members members, Member thisNode, DatagramSocket socket, LeaderElection election)
+    /**
+     * Create a message consumer to take messages from the blocking queue of {@link Message} objects
+     *
+     * @param messageQueue
+     *          the blocking queue of messages to take from
+     * @param members
+     *          the current members known within the joined group
+     * @param socket
+     *          the socket to send messages across on
+     * @param election
+     *          the implementation of {@link LeaderElection} to perform a leader election where necessary
+     * @param thisNode
+     *          the {@link Member} object representing this node that has been executed
+     */
+    public MessageConsumer(BlockingQueue messageQueue, Members members, DatagramSocket socket,
+                           LeaderElection election, Member thisNode)
     {
+        this.messageQueue = messageQueue;
         this.members = members;
-        this.thisNode = thisNode;
         this.socket = socket;
         this.election = election;
+        this.thisNode = thisNode;
     }
 
     @Override
@@ -50,32 +63,29 @@ public class MessageReceiver implements Runnable
     {
         try
         {
-            // continuous loop, always need to listen for messages while the node is still running
-            while(true)
+            // runs in parallel with MessageReceiver to take from the queue when possible
+            while (true)
             {
-
-                byte[] buffer = new byte[BUFFER_SIZE];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
-                socket.receive(packet);
-                String messageReceived = new String(packet.getData(), packet.getOffset(), packet.getLength());
-
-                JAXBContext context = JAXBContext.newInstance(Message.class);
-                Unmarshaller unmarshallerObj = context.createUnmarshaller();
-                Message message = (Message) unmarshallerObj.unmarshal(new StringReader(messageReceived));
-
-                if (message != null)
-                {
-                    this.handleMessageType(message);
-                }
+                // take the message from the queue and then apply logic based on the type of message received
+                Message message = (Message) messageQueue.take();
+                handleMessageType(message);
             }
         }
-        catch (IOException | JAXBException  e)
+        catch(InterruptedException | IOException e)
         {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Taking the message and applying the logic to handle it appropriately based on the type
+     * e.g. receiving a join request means update members with the joiner, and send back a list of all current members
+     *
+     * @param message
+     *          the message to be handled
+     * @throws UnknownHostException
+     *          if the IP from a responder is unknown
+     */
     private void handleMessageType(Message message) throws UnknownHostException
     {
         // send a message to the joiner with info on all current members
@@ -150,6 +160,18 @@ public class MessageReceiver implements Runnable
             // updating the members list to the current members
             // due to some not responding
             members.setMembers(message.getMembers());
+        }
+        else if (message.getType().equals(MessageTypes.GET_INFO))
+        {
+            // helper method to get info (for testing purposes)
+            // just sends this current list of members back
+            Member responder = message.getResponder();
+
+            System.out.println(members.toString());
+
+            SendAllCurrentMembers sender = new SendAllCurrentMembers(members, responder.getIp(),
+                    responder.getPortNumber(), thisNode, socket);
+            new Thread(sender).start();
         }
         else if (election.isElectionMessage(message.getType()))
         {

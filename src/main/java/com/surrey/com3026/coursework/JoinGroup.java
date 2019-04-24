@@ -5,16 +5,24 @@ import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
-import com.surrey.com3026.coursework.message.MessageReceiver;
+import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
+import com.surrey.com3026.coursework.message.receiver.MessageReceiver;
 import com.surrey.com3026.coursework.message.sender.JoinRequest;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class JoinGroup
 {
 
+    /**
+     * TODO refactor this into...
+     * TODO     -> basic getting args[0] etc.
+     * TODO     -> pass to another object to initialise all threads, socket etc.
+     */
     public static void main(String[] args)
     {
         try
@@ -38,15 +46,22 @@ public class JoinGroup
             }
             members.addMember(thisNode);
 
+            // create the message queue to for the message receiver and consumer to handle
+            BlockingQueue messageQueue = new LinkedBlockingQueue(20);
+
             // create the message sender to send messages (e.g. a new joiner request)
             DatagramSocket socket = new DatagramSocket(portNumber);
 
             // decide on leader election implementation
             LeaderElection election = new BullyLeaderElection(members, thisNode, socket);
 
-            // initialise to receive UDP messages on this node
-            MessageReceiver receiver = new MessageReceiver(members, thisNode, socket, election);
+            // initialise to receive UDP messages on this node and add them to the message queue
+            MessageReceiver receiver = new MessageReceiver(messageQueue, socket);
             new Thread(receiver).start();
+
+            // initialise to consume messages from the message queue
+            MessageConsumer consumer = new MessageConsumer(messageQueue, members, socket, election, thisNode);
+            new Thread(consumer).start();
 
             if (!(thisNode instanceof Leader))
             {

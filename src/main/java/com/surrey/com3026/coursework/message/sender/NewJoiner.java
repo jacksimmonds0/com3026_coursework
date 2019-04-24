@@ -4,7 +4,7 @@ import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
-import com.surrey.com3026.coursework.message.MessageReceiver;
+import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.checker.MembersResponseChecker;
 
@@ -16,16 +16,16 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
 {
     private Member responder;
 
-    private MessageReceiver receiver;
+    private MessageConsumer consumer;
 
     private LeaderElection election;
 
     public NewJoiner(Members members, Member thisNode, DatagramSocket socket, Member responder,
-                     MessageReceiver receiver, LeaderElection election)
+                     MessageConsumer consumer, LeaderElection election)
     {
         super(members, thisNode, socket);
         this.responder = responder;
-        this.receiver = receiver;
+        this.consumer = consumer;
         this.election = election;
     }
 
@@ -43,13 +43,13 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
             return;
         }
 
-        receiver.setMembersToCheckAccepted(membersToMessage);
+        consumer.setMembersToCheckAccepted(membersToMessage);
 
         Message message = new Message(MessageTypes.NEW_JOINER, thisNode);
         sendMessageToMultipleMembers(message, membersToMessage);
 
         // add listener to ensure all members are responding
-        MembersResponseChecker checker = new MembersResponseChecker(receiver, members, thisNode, socket, election);
+        MembersResponseChecker checker = new MembersResponseChecker(consumer, members, thisNode, socket, election);
         new Thread(checker).start();
     }
 

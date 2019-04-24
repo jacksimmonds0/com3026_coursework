@@ -28,6 +28,17 @@ public abstract class AbstractMessageSender
 
     protected DatagramSocket socket;
 
+    /**
+     * For testing purposes
+     */
+    public AbstractMessageSender(InetAddress address, int port, Member thisNode, DatagramSocket socket)
+    {
+        this.address = address;
+        this.port = port;
+        this.thisNode = thisNode;
+        this.socket = socket;
+    }
+
     public AbstractMessageSender(Members members, Member thisNode, DatagramSocket socket)
     {
         this.members = members;
@@ -37,11 +48,9 @@ public abstract class AbstractMessageSender
 
     public AbstractMessageSender(Members members, InetAddress address, int port, Member thisNode, DatagramSocket socket)
     {
-        this.members = members;
+        this(members, thisNode, socket);
         this.address = address;
         this.port = port;
-        this.thisNode = thisNode;
-        this.socket = socket;
     }
 
 

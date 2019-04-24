@@ -12,6 +12,6 @@ public interface MessageTypes
 
     public static final String UPDATE_MEMBERS = "update_members";
 
-
+    public static final String GET_INFO = "get_info";
 
 }
