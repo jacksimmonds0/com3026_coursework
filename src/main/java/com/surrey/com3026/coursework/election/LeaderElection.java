@@ -4,7 +4,7 @@ import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.message.Message;
 
 /**
- * Class to allow for different implementations of leader election algorithms (bully or ring)
+ * Interface to allow for different implementations of leader election algorithms (bully or ring)
  */
 public interface LeaderElection
 {

@@ -5,6 +5,7 @@ import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
+import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class BullyLeaderElection implements LeaderElection
 {
-    private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = 5 * 1000;
 
     private static final String ELECTION_INITIATE = "election_initiate";
 
@@ -28,7 +29,9 @@ public class BullyLeaderElection implements LeaderElection
 
     private static final String ELECTION_VICTORY = "election_victory";
 
-    private List<Message> receivedElectionAliveMessages;
+    private boolean waitingForResponses;
+
+    private List<Message> receivedElectionMessages;
 
     private Members members;
 
@@ -48,7 +51,8 @@ public class BullyLeaderElection implements LeaderElection
      */
     public BullyLeaderElection(Members members, Member thisNode, DatagramSocket socket)
     {
-        this.receivedElectionAliveMessages = new ArrayList<>();
+        this.waitingForResponses = false;
+        this.receivedElectionMessages = new ArrayList<>();
         this.members = members;
         this.thisNode = thisNode;
         this.socket = socket;
@@ -59,6 +63,10 @@ public class BullyLeaderElection implements LeaderElection
     {
         List<Member> higherIdMembers = getMembersWithHigherId(thisNode);
 
+        System.out.println("<-------------------->");
+        System.out.println(higherIdMembers);
+        System.out.println("<-------------------->");
+
         // check if thisNode has the highest process ID in the list
         if (higherIdMembers.isEmpty())
         {
@@ -66,6 +74,7 @@ public class BullyLeaderElection implements LeaderElection
             {
                 // update this node to coordinator in this nodes members list
                 // send victory message to all
+                System.out.println("No higher id members");
                 sendVictory();
             }
             catch (UnknownHostException e)
@@ -75,41 +84,49 @@ public class BullyLeaderElection implements LeaderElection
         }
         else
         {
+            waitingForResponses = true;
+
             // send an election initiate message to higher ID members
             BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket,
                     ELECTION_INITIATE, higherIdMembers);
             new Thread(sender).start();
 
-            waitForResponses();
+            waitForResponses(higherIdMembers);
         }
     }
 
     @Override
     public void handleElectionMessage(Message message)
     {
-        if (message.getType().equals(ELECTION_VICTORY))
+        System.out.println(message.getType());
+        if (waitingForResponses)
         {
-            System.out.println("Received ELECTION VICTORY");
-            complete((Leader) message.getResponder());
-        }
-        else if (message.getType().equals(ELECTION_INITIATE))
-        {
-            Member electionInitiator = message.getResponder();
-
-            // return election_alive response
-            BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket,
-                    ELECTION_ALIVE, Collections.singletonList(electionInitiator));
-            new Thread(sender).start();
-
-            if (electionInitiator.getId() < thisNode.getId())
-            {
-                // lower ID = restart process
-                this.initiate();
-            }
+            this.receivedElectionMessages.add(message);
         }
         else
         {
-            this.receivedElectionAliveMessages.add(message);
+            if (message.getType().equals(ELECTION_VICTORY))
+            {
+                System.out.println("Received ELECTION VICTORY");
+                complete((Leader) message.getResponder());
+            }
+            else if (message.getType().equals(ELECTION_INITIATE))
+            {
+                Member electionInitiator = message.getResponder();
+
+                // return election_alive response
+                BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket,
+                        ELECTION_ALIVE, Collections.singletonList(electionInitiator));
+                new Thread(sender).start();
+
+                System.out.println("Got election initiate message from " + electionInitiator.getId());
+                if (electionInitiator.getId() < thisNode.getId())
+                {
+                    // lower ID = restart process
+                    // prevent sending victory multiple times
+                    this.initiate();
+                }
+            }
         }
     }
 
@@ -131,18 +148,19 @@ public class BullyLeaderElection implements LeaderElection
     {
         List<Member> higherIds = new ArrayList<>(members.getMembers());
 
-        higherIds = higherIds.stream()
+        return higherIds.stream()
                 .filter(member -> member.getId() > memberToCheck.getId())
                 .collect(Collectors.toList());
-
-        return higherIds;
     }
 
 
     /**
      * Wait for election responses until the TIMEOUT
+     *
+     * @param membersMessaged
+     *          the list of {@link Member}s that have been messaged with election_initiate
      */
-    private void waitForResponses()
+    private void waitForResponses(List<Member> membersMessaged)
     {
         new Timer().schedule(
                 new TimerTask()
@@ -150,31 +168,51 @@ public class BullyLeaderElection implements LeaderElection
                     @Override
                     public void run()
                     {
-                        if (receivedElectionAliveMessages.isEmpty())
-                        {
-                            // no response received = send victory
-                            try
-                            {
-                                sendVictory();
-                            }
-                            catch (UnknownHostException e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        List<Member> membersResponded = receivedElectionAliveMessages.stream()
-                                .map(Message::getResponder)
+                        List<Message> victoriesReceived = receivedElectionMessages.stream()
+                                .filter(message -> message.getType().equals(ELECTION_VICTORY))
                                 .collect(Collectors.toList());
 
-                        for (Member responder : membersResponded)
+                        if (!victoriesReceived.isEmpty())
                         {
-                            // response from process with higher ID, so stop the algorithm
-                            if (responder.getId() > thisNode.getId())
+                            complete((Leader) victoriesReceived.get(0).getResponder());
+                        }
+                        else
+                        {
+                            List<Member> membersResponded = receivedElectionMessages.stream()
+                                    .filter(message -> message.getType().equals(ELECTION_ALIVE))
+                                    .map(Message::getResponder)
+                                    .collect(Collectors.toList());
+
+                            // if no higher ID processes respond, then we can just make this node the leader
+                            // to complete the algorithm
+                            if (membersResponded.isEmpty())
                             {
-                                return;
+                                try
+                                {
+                                    System.out.println("Waited for responses");
+                                    sendVictory();
+                                }
+                                catch (UnknownHostException e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            // update all others lists to remove those who are not responding
+                            List<Member> membersNotResponding = membersMessaged.stream()
+                                    .filter(membersResponded::contains)
+                                    .collect(Collectors.toList());
+
+                            if (!membersNotResponding.isEmpty())
+                            {
+                                members.removeMembers(membersNotResponding);
+                                UpdateMembers sender = new UpdateMembers(members, thisNode, socket);
+                                new Thread(sender).start();
                             }
                         }
+
+                        // reset after timeout for next potential leader election
+                        waitingForResponses = false;
                     }
                 }, TIMEOUT
         );
@@ -205,6 +243,9 @@ public class BullyLeaderElection implements LeaderElection
         System.out.println("New leader: " + leader.toString());
 
 
+        // clear the list of received messages to allow for the next potential election in the future
+        receivedElectionMessages.clear();
+
         // change members list and thisNode to a leader object (if appropriate)
         if (thisNode.equals(leader))
         {
@@ -222,6 +263,7 @@ public class BullyLeaderElection implements LeaderElection
             }
         }
         System.out.println(members.toString());
+
     }
 
 
