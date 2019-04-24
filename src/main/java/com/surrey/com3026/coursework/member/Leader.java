@@ -14,7 +14,7 @@ public class Leader extends Member {
     {
     }
 
-    public Leader(int id, int portNumber) throws UnknownHostException
+    public Leader(int id, int portNumber)
     {
         super(id, portNumber);
         this.isLeader = true;

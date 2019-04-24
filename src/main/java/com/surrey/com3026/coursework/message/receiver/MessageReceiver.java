@@ -34,13 +34,19 @@ public class MessageReceiver implements Runnable
 
     private DatagramSocket socket;
 
-
+    /**
+     * Instantiate a receiver to get messages from the socket and place them on the queue
+     *
+     * @param messageQueue
+     *          the {@link BlockingQueue} to place messages on
+     * @param socket
+     *          the socket to receive packets on
+     */
     public MessageReceiver(BlockingQueue messageQueue, DatagramSocket socket)
     {
         this.messageQueue = messageQueue;
         this.socket = socket;
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
@@ -58,6 +64,7 @@ public class MessageReceiver implements Runnable
                 socket.receive(packet);
                 String messageReceived = new String(packet.getData(), packet.getOffset(), packet.getLength());
 
+                // unmarshalling the message to a Message object to then place on the queue
                 JAXBContext context = JAXBContext.newInstance(Message.class);
                 Unmarshaller unmarshallerObj = context.createUnmarshaller();
                 Message message = (Message) unmarshallerObj.unmarshal(new StringReader(messageReceived));
