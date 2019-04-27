@@ -64,8 +64,6 @@ public class MessageReceiver implements Runnable
                 socket.receive(packet);
                 String messageReceived = new String(packet.getData(), packet.getOffset(), packet.getLength());
 
-                System.out.println(messageReceived);
-
                 // unmarshalling the message to a Message object to then place on the queue
                 JAXBContext context = JAXBContext.newInstance(Message.class);
                 Unmarshaller unmarshallerObj = context.createUnmarshaller();

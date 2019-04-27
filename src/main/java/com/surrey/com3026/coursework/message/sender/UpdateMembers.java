@@ -19,7 +19,7 @@ public class UpdateMembers extends AbstractMessageSender implements Runnable
     @Override
     public void run()
     {
-        Message message = new Message(MessageTypes.UPDATE_MEMBERS, members.getMembers());
+        Message message = new Message(MessageTypes.UPDATE_MEMBERS, members.getMembers(), thisNode);
         broadcastMessage(message);
     }
 }

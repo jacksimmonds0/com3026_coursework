@@ -10,6 +10,7 @@ import com.surrey.com3026.coursework.message.sender.NewJoiner;
 import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
@@ -74,15 +75,14 @@ public class MessageConsumer implements Runnable
             {
                 // take the message from the queue and then apply logic based on the type of message received
                 Message message = (Message) messageQueue.take();
+
+                // used to check digital signature is correct
                 int responderId = message.getResponder().getId();
                 byte[] signature = message.getSignature();
 
-                System.out.println(
-                        new String(signature)
-                );
-
                 if (signatureHandler.verify(responderId, signature))
                 {
+                    System.out.println("Signature verified from node " + responderId);
                     handleMessageType(message);
                 }
                 else

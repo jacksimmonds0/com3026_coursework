@@ -2,6 +2,7 @@ package com.surrey.com3026.coursework.security;
 
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.security.cert.CertificateException;
 
 public class SignatureHandler
 {
-    private static final byte[] SIGNATURE_PLACEHOLDER = "Signature here!".getBytes();
+    private static final byte[] SIGNATURE_PLACEHOLDER = "Signature here".getBytes();
 
     private KeyStore keyStore;
 
@@ -48,14 +49,8 @@ public class SignatureHandler
             Signature dsa = Signature.getInstance(KeyGenerator.SIG_ALGORITHM, "SUN");
             PrivateKey priv = (PrivateKey) keyStore.getKey(KeyGenerator.CERT_CHAIN_ALIAS, KeyGenerator.PASSWORD);
 
-            System.out.println(keyStore.getCreationDate(KeyGenerator.CERT_CHAIN_ALIAS));
-
             dsa.initSign(priv);
             dsa.update(SIGNATURE_PLACEHOLDER);
-
-            System.out.println(
-                    new String(dsa.sign())
-            );
 
             return dsa.sign();
         }
@@ -82,7 +77,7 @@ public class SignatureHandler
         try
         {
             Certificate[] chain = keyStore.getCertificateChain(KeyGenerator.CERT_CHAIN_ALIAS);
-            Certificate responderCert = chain[nodeId];
+            Certificate responderCert = chain[nodeId-1];
 
             Signature sig = Signature.getInstance(KeyGenerator.SIG_ALGORITHM, "SUN");
             sig.initVerify(responderCert);
@@ -94,8 +89,9 @@ public class SignatureHandler
                 | SignatureException | InvalidKeyException e)
         {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
 
 }
