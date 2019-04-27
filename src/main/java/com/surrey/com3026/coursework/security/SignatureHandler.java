@@ -2,11 +2,6 @@ package com.surrey.com3026.coursework.security;
 
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
 
-import javax.xml.bind.DatatypeConverter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -17,7 +12,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 
 public class SignatureHandler
 {

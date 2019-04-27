@@ -10,7 +10,6 @@ import com.surrey.com3026.coursework.message.sender.NewJoiner;
 import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;

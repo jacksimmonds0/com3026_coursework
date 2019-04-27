@@ -1,13 +1,6 @@
 package com.surrey.com3026.coursework.message.receiver;
 
-import com.surrey.com3026.coursework.election.LeaderElection;
-import com.surrey.com3026.coursework.member.Member;
-import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
-import com.surrey.com3026.coursework.message.MessageTypes;
-import com.surrey.com3026.coursework.message.sender.AcceptJoiner;
-import com.surrey.com3026.coursework.message.sender.NewJoiner;
-import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -16,10 +9,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 

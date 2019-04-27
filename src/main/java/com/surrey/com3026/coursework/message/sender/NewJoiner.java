@@ -4,9 +4,9 @@ import com.surrey.com3026.coursework.election.LeaderElection;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
-import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.checker.MembersResponseChecker;
+import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import java.net.DatagramSocket;
