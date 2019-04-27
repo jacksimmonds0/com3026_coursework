@@ -1,6 +1,5 @@
 package com.surrey.com3026.coursework.security.generator;
 
-
 import sun.security.tools.keytool.CertAndKeyGen;
 import sun.security.x509.X500Name;
 
@@ -13,12 +12,21 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class KeyGenerator
 {
     public static final char[] PASSWORD = "password1".toCharArray();
+
+    public static final String KEY_TYPE = "DSA";
+
+    public static final String SIG_ALGORITHM = "SHA1withDSA";
+
+    public static final String CERT_CHAIN_ALIAS = "group-cert-chain";
+
+    private static final long ONE_YEAR = (long) 365 * 24 * 60 * 60;
 
     public static void main(String[] args)
     {
@@ -47,7 +55,8 @@ public class KeyGenerator
         // save all keystore objects out to files for each nodes copy
         for (int i = 0; i < noKeysToGen; i++)
         {
-            try (OutputStream fos = new FileOutputStream("node-" + (i+1) + ".jks")) {
+            try (OutputStream fos = new FileOutputStream("node-" + (i+1) + ".jks"))
+            {
                 KeyStore ks = keyStores[i];
                 ks.store(fos, PASSWORD);
             }
@@ -77,15 +86,13 @@ public class KeyGenerator
             try
             {
                 // generate it with 2048 bits
-                CertAndKeyGen certGen = new CertAndKeyGen("DSA", "SHAwithDSA");
+                CertAndKeyGen certGen = new CertAndKeyGen(KEY_TYPE, SIG_ALGORITHM);
                 certGen.generate(2048);
 
                 gens[i] = certGen;
 
-                // valid for one year
-                long validSecs = (long) 365 * 24 * 60 * 60;
                 X509Certificate cert = certGen.getSelfCertificate(
-                        new X500Name("CN=Distributed Systems,O=University of Surrey,L=Guildford,C=UK"), validSecs);
+                        new X500Name("CN=Distributed Systems,O=University of Surrey,L=Guildford,C=UK"), ONE_YEAR);
 
                 certificateChain[i] = cert;
             }
@@ -98,15 +105,14 @@ public class KeyGenerator
 
         // then use arrays to add to each keystore the entire certificate chain and private key for a single node
         // so we can create a keystore for each node
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < noKeysToGen; i++)
         {
-            CertAndKeyGen certGen = gens[0];
-            KeyStore keyStore = keyStores[0];
+            CertAndKeyGen certGen = gens[i];
+            KeyStore keyStore = keyStores[i];
 
             try
             {
-                String certAlias = "node-" + (i+1);
-                keyStore.setKeyEntry(certAlias, certGen.getPrivateKey(), PASSWORD, certificateChain);
+                keyStore.setKeyEntry(CERT_CHAIN_ALIAS, certGen.getPrivateKey(), PASSWORD, certificateChain);
             }
             catch (KeyStoreException e)
             {

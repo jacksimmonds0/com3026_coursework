@@ -6,6 +6,7 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
+import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
@@ -39,6 +40,8 @@ public class BullyLeaderElection implements LeaderElection
 
     private DatagramSocket socket;
 
+    private SignatureHandler signatureHandler;
+
     /**
      * Create a bully leader election object
      *
@@ -49,13 +52,15 @@ public class BullyLeaderElection implements LeaderElection
      * @param socket
      *          the UDP {@link DatagramSocket} to send election messages across
      */
-    public BullyLeaderElection(Members members, Member thisNode, DatagramSocket socket)
+    public BullyLeaderElection(Members members, Member thisNode, DatagramSocket socket,
+                               SignatureHandler signatureHandler)
     {
         this.waitingForResponses = false;
         this.receivedElectionMessages = new ArrayList<>();
         this.members = members;
         this.thisNode = thisNode;
         this.socket = socket;
+        this.signatureHandler = signatureHandler;
     }
 
     @Override
@@ -87,7 +92,7 @@ public class BullyLeaderElection implements LeaderElection
             waitingForResponses = true;
 
             // send an election initiate message to higher ID members
-            BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket,
+            BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket, signatureHandler,
                     ELECTION_INITIATE, higherIdMembers);
             new Thread(sender).start();
 
@@ -115,7 +120,7 @@ public class BullyLeaderElection implements LeaderElection
                 Member electionInitiator = message.getResponder();
 
                 // return election_alive response
-                BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket,
+                BullyElectionSender sender = new BullyElectionSender(members, thisNode, socket, signatureHandler,
                         ELECTION_ALIVE, Collections.singletonList(electionInitiator));
                 new Thread(sender).start();
 
@@ -206,7 +211,7 @@ public class BullyLeaderElection implements LeaderElection
                             if (!membersNotResponding.isEmpty())
                             {
                                 members.removeMembers(membersNotResponding);
-                                UpdateMembers sender = new UpdateMembers(members, thisNode, socket);
+                                UpdateMembers sender = new UpdateMembers(members, thisNode, socket, signatureHandler);
                                 new Thread(sender).start();
                             }
                         }
@@ -229,7 +234,7 @@ public class BullyLeaderElection implements LeaderElection
     {
         Leader newLeader = new Leader(thisNode.getId(), thisNode.getPortNumber());
 
-        BullyElectionSender sender = new BullyElectionSender(members, newLeader, socket, ELECTION_VICTORY);
+        BullyElectionSender sender = new BullyElectionSender(members, newLeader, socket, signatureHandler, ELECTION_VICTORY);
         new Thread(sender).start();
 
         // complete the algorithm as this node is now the leader
@@ -288,9 +293,10 @@ public class BullyLeaderElection implements LeaderElection
          * @param messageType
          *          the type of election message being sent
          */
-        BullyElectionSender(Members members, Member thisNode, DatagramSocket socket, String messageType)
+        BullyElectionSender(Members members, Member thisNode, DatagramSocket socket, SignatureHandler signatureHandler,
+                            String messageType)
         {
-            super(members, thisNode, socket);
+            super(members, thisNode, socket, signatureHandler);
             this.messageType = messageType;
         }
 
@@ -308,10 +314,10 @@ public class BullyLeaderElection implements LeaderElection
          * @param memberToMessage
          *          the list of members to send the message to
          */
-        BullyElectionSender(Members members, Member thisNode, DatagramSocket socket,
+        BullyElectionSender(Members members, Member thisNode, DatagramSocket socket, SignatureHandler signatureHandler,
                                    String messageType, List<Member> memberToMessage)
         {
-            super(members, thisNode, socket);
+            super(members, thisNode, socket, signatureHandler);
             this.messageType = messageType;
             this.membersToMessage = memberToMessage;
         }

@@ -2,12 +2,16 @@ package com.surrey.com3026.coursework.message;
 
 import com.surrey.com3026.coursework.member.Member;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @XmlRootElement
-public class Message {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Message
+{
 
     @XmlElement
     private String type;
@@ -17,6 +21,9 @@ public class Message {
 
     @XmlElement
     private Member responder;
+
+    @XmlElement
+    private byte[] signature;
 
     public Message()
     {
@@ -56,8 +63,19 @@ public class Message {
         return responder;
     }
 
+    public byte[] getSignature()
+    {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature)
+    {
+        this.signature = signature;
+    }
+
     @Override
-    public String toString() {
+    public String toString()
+    {
         return type;
     }
 }

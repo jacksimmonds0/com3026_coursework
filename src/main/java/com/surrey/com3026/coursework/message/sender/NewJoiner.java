@@ -7,6 +7,7 @@ import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.checker.MembersResponseChecker;
+import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import java.net.DatagramSocket;
 import java.util.ArrayList;
@@ -20,13 +21,16 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
 
     private LeaderElection election;
 
+    private SignatureHandler signatureHandler;
+
     public NewJoiner(Members members, Member thisNode, DatagramSocket socket, Member responder,
-                     MessageConsumer consumer, LeaderElection election)
+                     MessageConsumer consumer, LeaderElection election, SignatureHandler signatureHandler)
     {
-        super(members, thisNode, socket);
+        super(members, thisNode, socket, signatureHandler);
         this.responder = responder;
         this.consumer = consumer;
         this.election = election;
+        this.signatureHandler =  signatureHandler;
     }
 
     @Override
@@ -49,7 +53,8 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
         sendMessageToMultipleMembers(message, membersToMessage);
 
         // add listener to ensure all members are responding
-        MembersResponseChecker checker = new MembersResponseChecker(consumer, members, thisNode, socket, election);
+        MembersResponseChecker checker = new MembersResponseChecker(consumer, members, thisNode, socket,
+                election, signatureHandler);
         new Thread(checker).start();
     }
 

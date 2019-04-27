@@ -28,7 +28,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class MessageReceiver implements Runnable
 {
-    private static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 4096;
 
     private BlockingQueue messageQueue;
 
@@ -63,6 +63,8 @@ public class MessageReceiver implements Runnable
 
                 socket.receive(packet);
                 String messageReceived = new String(packet.getData(), packet.getOffset(), packet.getLength());
+
+                System.out.println(messageReceived);
 
                 // unmarshalling the message to a Message object to then place on the queue
                 JAXBContext context = JAXBContext.newInstance(Message.class);

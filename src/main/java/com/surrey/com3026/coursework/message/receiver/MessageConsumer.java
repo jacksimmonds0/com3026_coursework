@@ -8,6 +8,7 @@ import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.sender.AcceptJoiner;
 import com.surrey.com3026.coursework.message.sender.NewJoiner;
 import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
+import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -32,6 +33,8 @@ public class MessageConsumer implements Runnable
 
     private Member thisNode;
 
+    private SignatureHandler signatureHandler;
+
     private List<Member> membersToCheckAccepted = Collections.synchronizedList(new ArrayList<>());
 
     /**
@@ -47,15 +50,18 @@ public class MessageConsumer implements Runnable
      *          the implementation of {@link LeaderElection} to perform a leader election where necessary
      * @param thisNode
      *          the {@link Member} object representing this node that has been executed
+     * @param signatureHandler
+     *          the class to verify the sign of the received message and sign messages to send
      */
     public MessageConsumer(BlockingQueue messageQueue, Members members, DatagramSocket socket,
-                           LeaderElection election, Member thisNode)
+                           LeaderElection election, Member thisNode, SignatureHandler signatureHandler)
     {
         this.messageQueue = messageQueue;
         this.members = members;
         this.socket = socket;
         this.election = election;
         this.thisNode = thisNode;
+        this.signatureHandler = signatureHandler;
     }
 
     @Override
@@ -68,10 +74,25 @@ public class MessageConsumer implements Runnable
             {
                 // take the message from the queue and then apply logic based on the type of message received
                 Message message = (Message) messageQueue.take();
-                handleMessageType(message);
+                int responderId = message.getResponder().getId();
+                byte[] signature = message.getSignature();
+
+                System.out.println(
+                        new String(signature)
+                );
+
+                if (signatureHandler.verify(responderId, signature))
+                {
+                    handleMessageType(message);
+                }
+                else
+                {
+                    // return message that message is not verified?
+                }
+
             }
         }
-        catch(InterruptedException | IOException e)
+        catch (InterruptedException | IOException e)
         {
             e.printStackTrace();
         }
@@ -103,7 +124,7 @@ public class MessageConsumer implements Runnable
 
 
             SendAllCurrentMembers sender = new SendAllCurrentMembers(members, newJoiner.getIp(),
-                    newJoiner.getPortNumber(), thisNode, socket);
+                    newJoiner.getPortNumber(), thisNode, socket, signatureHandler);
             new Thread(sender).start();
         }
         else if (message.getType().equals(MessageTypes.NEW_JOINER))
@@ -120,7 +141,7 @@ public class MessageConsumer implements Runnable
             // send accept_joiner
             // need to check that all these accepted messages are received
             AcceptJoiner sender = new AcceptJoiner(members, newJoiner.getIp(),
-                    newJoiner.getPortNumber(), thisNode, socket);
+                    newJoiner.getPortNumber(), thisNode, socket, signatureHandler);
             new Thread(sender).start();
         }
         else if (message.getType().equals(MessageTypes.ALL_CURRENT_MEMBERS))
@@ -138,7 +159,7 @@ public class MessageConsumer implements Runnable
             if (message.getResponder() != null)
             {
                 NewJoiner sender = new NewJoiner(members, thisNode, socket, message.getResponder(),
-                        this, election);
+                        this, election, signatureHandler);
                 new Thread(sender).start();
             }
         }
@@ -170,7 +191,7 @@ public class MessageConsumer implements Runnable
             System.out.println(members.toString());
 
             SendAllCurrentMembers sender = new SendAllCurrentMembers(members, responder.getIp(),
-                    responder.getPortNumber(), thisNode, socket);
+                    responder.getPortNumber(), thisNode, socket, signatureHandler);
             new Thread(sender).start();
         }
         else if (election.isElectionMessage(message.getType()))

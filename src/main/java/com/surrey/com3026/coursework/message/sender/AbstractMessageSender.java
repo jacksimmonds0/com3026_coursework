@@ -3,6 +3,7 @@ package com.surrey.com3026.coursework.message.sender;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
+import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,6 +29,8 @@ public abstract class AbstractMessageSender
 
     protected DatagramSocket socket;
 
+    private SignatureHandler signatureHandler;
+
     /**
      * For testing purposes
      */
@@ -39,16 +42,19 @@ public abstract class AbstractMessageSender
         this.socket = socket;
     }
 
-    public AbstractMessageSender(Members members, Member thisNode, DatagramSocket socket)
+    public AbstractMessageSender(Members members, Member thisNode, DatagramSocket socket,
+                                 SignatureHandler signatureHandler)
     {
         this.members = members;
         this.thisNode = thisNode;
         this.socket = socket;
+        this.signatureHandler = signatureHandler;
     }
 
-    public AbstractMessageSender(Members members, InetAddress address, int port, Member thisNode, DatagramSocket socket)
+    public AbstractMessageSender(Members members, InetAddress address, int port, Member thisNode,
+                                 DatagramSocket socket, SignatureHandler signatureHandler)
     {
-        this(members, thisNode, socket);
+        this(members, thisNode, socket, signatureHandler);
         this.address = address;
         this.port = port;
     }
@@ -56,6 +62,11 @@ public abstract class AbstractMessageSender
 
     protected void sendMessage(InetAddress address, int port, Message message)
     {
+        // TODO change this to a class variable?
+        // TODO force all messages to have a responder field, otherwise the digital signatures will fail
+        // TODO as it relies on the responder ID to get the right certificate in the chain
+
+        message.setSignature(signatureHandler.sign());
         String messageString = this.getMarshalledMessage(message);
 
         byte[] buffer = messageString.getBytes();

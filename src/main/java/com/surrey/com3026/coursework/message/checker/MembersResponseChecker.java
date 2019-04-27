@@ -6,6 +6,7 @@ import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
+import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import java.net.DatagramSocket;
 import java.util.List;
@@ -32,14 +33,17 @@ public class MembersResponseChecker implements Runnable
 
     private LeaderElection election;
 
-    public MembersResponseChecker(MessageConsumer consumer, Members members, Member thisNode,
-                                  DatagramSocket socket, LeaderElection election)
+    private SignatureHandler signatureHandler;
+
+    public MembersResponseChecker(MessageConsumer consumer, Members members, Member thisNode, DatagramSocket socket,
+                                  LeaderElection election, SignatureHandler signatureHandler)
     {
         this.consumer = consumer;
         this.members = members;
         this.thisNode = thisNode;
         this.socket = socket;
         this.election = election;
+        this.signatureHandler = signatureHandler;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class MembersResponseChecker implements Runnable
 
                             // send updated list to all other members
                             members.removeMembers(remaining);
-                            UpdateMembers sender = new UpdateMembers(members, thisNode, socket);
+                            UpdateMembers sender = new UpdateMembers(members, thisNode, socket, signatureHandler);
                             new Thread(sender).start();
 
                             // see if any of the non-responsive previous members was the leader/coordinator
