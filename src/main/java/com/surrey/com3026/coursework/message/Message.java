@@ -70,6 +70,18 @@ public class Message
     @Override
     public String toString()
     {
-        return type;
+        if (members != null)
+        {
+            return "{ type=" + type +
+                    ", members=" + members.toString() +
+                    ", responder=" + responder.toString() +
+                    "}";
+        }
+        else
+        {
+            return "{ type=" + type +
+                    ", responder=" + responder.toString() +
+                    "}";
+        }
     }
 }

@@ -21,8 +21,6 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
 
     private LeaderElection election;
 
-    private SignatureHandler signatureHandler;
-
     public NewJoiner(Members members, Member thisNode, DatagramSocket socket, Member responder,
                      MessageConsumer consumer, LeaderElection election, SignatureHandler signatureHandler)
     {
@@ -30,7 +28,6 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
         this.responder = responder;
         this.consumer = consumer;
         this.election = election;
-        this.signatureHandler =  signatureHandler;
     }
 
     @Override

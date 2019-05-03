@@ -79,7 +79,7 @@ public class MessageConsumer implements Runnable
                 int responderId = message.getResponder().getId();
                 byte[] signature = message.getSignature();
 
-                if (signatureHandler.verify(responderId, signature))
+                if (signatureHandler.verify(responderId, signature, message.toString().getBytes()))
                 {
                     System.out.println("Signature verified from node " + responderId);
                     handleMessageType(message);
@@ -87,6 +87,7 @@ public class MessageConsumer implements Runnable
                 else
                 {
                     // return message that message is not verified?
+                    System.out.println("Unable to verify signature from node " + responderId);
                 }
 
             }

@@ -51,6 +51,8 @@ public class BullyLeaderElection implements LeaderElection
      *          the {@link Member} representing this node
      * @param socket
      *          the UDP {@link DatagramSocket} to send election messages across
+     * @param signatureHandler
+     *          the handler for signatures, to create a digital signature on messages sent
      */
     public BullyLeaderElection(Members members, Member thisNode, DatagramSocket socket,
                                SignatureHandler signatureHandler)
@@ -290,6 +292,8 @@ public class BullyLeaderElection implements LeaderElection
          *          the {@link Member} representing this node
          * @param socket
          *          the {@link DatagramSocket} to sent messages on
+         * @param signatureHandler
+         *          the handler for signatures, to create a digital signature on messages sent
          * @param messageType
          *          the type of election message being sent
          */
@@ -309,6 +313,8 @@ public class BullyLeaderElection implements LeaderElection
          *          the {@link Member} representing this node
          * @param socket
          *          the {@link DatagramSocket} to sent messages on
+         * @param signatureHandler
+         *          the handler for signatures, to create a digital signature on messages sent
          * @param messageType
          *          the type of election message being sent
          * @param memberToMessage

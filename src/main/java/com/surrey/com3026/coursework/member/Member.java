@@ -75,6 +75,8 @@ public class Member
             return false;
         }
 
-        return id == ((Member) obj).getId();
+        Member objMember = (Member) obj;
+        return id == objMember.getId() && ipAddress.equals(objMember.getIpAddress())
+                && portNumber == objMember.getPortNumber();
     }
 }

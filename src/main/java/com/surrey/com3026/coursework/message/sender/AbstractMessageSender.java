@@ -32,7 +32,7 @@ public abstract class AbstractMessageSender
 
     protected DatagramSocket socket;
 
-    private SignatureHandler signatureHandler;
+    protected SignatureHandler signatureHandler;
 
     /**
      * For testing purposes
@@ -66,12 +66,12 @@ public abstract class AbstractMessageSender
     protected void sendMessage(InetAddress address, int port, Message message)
     {
         // TODO change this to a class variable?
-        // TODO force all messages to have a responder field, otherwise the digital signatures will fail
-        // TODO as it relies on the responder ID to get the right certificate in the chain
+//
+//        String messageToSign = message.getType() + " from node-" + thisNode.getId();
+//        byte[] dataToSign = messageToSign.getBytes();
+        message.setSignature(signatureHandler.sign(message.toString().getBytes()));
 
-        message.setSignature(signatureHandler.sign());
         String messageString = this.getMarshalledMessage(message);
-
         byte[] buffer = messageString.getBytes();
 
         DatagramPacket packet = new DatagramPacket(

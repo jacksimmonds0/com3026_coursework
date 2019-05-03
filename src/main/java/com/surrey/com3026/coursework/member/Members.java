@@ -24,7 +24,11 @@ public class Members
 
     public void addMember(Member member)
     {
-        this.members.add(member);
+        // prevent duplicates
+        if (!members.contains(member))
+        {
+            this.members.add(member);
+        }
     }
 
     public List<Member> getMembers()
