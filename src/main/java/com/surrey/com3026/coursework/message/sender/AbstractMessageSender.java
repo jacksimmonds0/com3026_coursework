@@ -37,12 +37,14 @@ public abstract class AbstractMessageSender
     /**
      * For testing purposes
      */
-    public AbstractMessageSender(InetAddress address, int port, Member thisNode, DatagramSocket socket)
+    public AbstractMessageSender(InetAddress address, int port, Member thisNode, DatagramSocket socket,
+                                 SignatureHandler signatureHandler)
     {
         this.address = address;
         this.port = port;
         this.thisNode = thisNode;
         this.socket = socket;
+        this.signatureHandler = signatureHandler;
     }
 
     public AbstractMessageSender(Members members, Member thisNode, DatagramSocket socket,
@@ -66,9 +68,9 @@ public abstract class AbstractMessageSender
     protected void sendMessage(InetAddress address, int port, Message message)
     {
         // TODO change this to a class variable?
-//
-//        String messageToSign = message.getType() + " from node-" + thisNode.getId();
-//        byte[] dataToSign = messageToSign.getBytes();
+
+        // set signature using message toString method
+        // within this class uses HMAC for hashing the message before signing with private key
         message.setSignature(signatureHandler.sign(message.toString().getBytes()));
 
         String messageString = this.getMarshalledMessage(message);

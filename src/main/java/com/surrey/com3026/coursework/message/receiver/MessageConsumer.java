@@ -86,8 +86,11 @@ public class MessageConsumer implements Runnable
                 }
                 else
                 {
-                    // return message that message is not verified?
+                    // Ignore the message since it could not be verified
+                    // Log this fact to the console to show why the message was ignored
                     System.out.println("Unable to verify signature from node " + responderId);
+                    System.out.println(new String(signature));
+                    System.out.println(message.toString());
                 }
 
             }

@@ -1,6 +1,5 @@
 package com.surrey.com3026.coursework;
 
-import com.surrey.com3026.coursework.helper.GetInfoHelper;
 import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Leader;
 import com.surrey.com3026.coursework.message.Message;
@@ -24,6 +23,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+
+/**
+ * Testing plan
+ *
+ * Synchronisation_IT   - when a member joins, all members have the correct list get info from all nodes(?)
+ * Replication_IT       -
+ * FaultTolerance_IT    - testing leader election, create group, kill leader, join node, get info and assert new leader correct
+ * Recovery_IT          - create group, kill node, spin same node back up, can get same members list correctly
+ * Security_IT          - don't sign the message properly / change the message between signing and sending
+ */
 public class JoiningGroup_IT extends AbstractNodeTester
 {
 
@@ -72,7 +81,7 @@ public class JoiningGroup_IT extends AbstractNodeTester
 
 
     @Test
-    public void test_node_2_shuts_down_node_4_joins() throws Exception
+    public void test_3_join_node_2_shuts_down_node_4_joins() throws Exception
     {
         Node n1 = createNode("1", "8001");
         Node n2 = createNode("2", "8002", "127.0.0.1:8001");
@@ -87,7 +96,7 @@ public class JoiningGroup_IT extends AbstractNodeTester
 
         // node 2 has been stopped so should not be present
         List<Member> expected = Arrays.asList(
-                new Member(1, 8001),
+                new Leader(1, 8001),
                 new Member(3, 8003),
                 new Member(4, 8004)
         );
@@ -100,6 +109,6 @@ public class JoiningGroup_IT extends AbstractNodeTester
             assertTrue(currentMembers.contains(m));
         }
     }
-    
+
 
 }

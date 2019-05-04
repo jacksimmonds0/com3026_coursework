@@ -130,7 +130,6 @@ public class BullyLeaderElection implements LeaderElection
                 if (electionInitiator.getId() < thisNode.getId())
                 {
                     // lower ID = restart process
-                    // prevent sending victory multiple times
                     this.initiate();
                 }
             }

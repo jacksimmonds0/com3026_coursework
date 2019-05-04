@@ -65,11 +65,11 @@ public class SignatureHandler
      * Verify the signature from the message sent by a member within the group
      *
      * @param nodeId
-     *          the ID of the responder node
+     *          the ID of the responder node to get their public key from the certificate chain
      * @param signedMessage
      *          the signed message sent
      * @param expectedMessage
-     *          the message expected to be recieved
+     *          the message expected to be received
      * @return true if the sign is verified, false otherwise or if exception is thrown
      */
     public boolean verify(int nodeId, byte[] signedMessage, byte[] expectedMessage)
@@ -101,21 +101,10 @@ public class SignatureHandler
      *          the message to hash
      * @return the hashed message
      */
-    private byte[] createMessageDigest(byte[] message)
+    private byte[] createMessageDigest(byte[] message) throws NoSuchAlgorithmException
     {
-        byte[] hashedMessage = null;
-        try
-        {
-            MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
-            hashedMessage = messageDigest.digest(message);
-
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
-        }
-
-        return hashedMessage;
+        MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
+        return messageDigest.digest(message);
     }
 
 }
