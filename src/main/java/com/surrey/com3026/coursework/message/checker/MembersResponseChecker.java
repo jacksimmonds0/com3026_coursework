@@ -7,6 +7,7 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 import com.surrey.com3026.coursework.security.SignatureHandler;
+import org.apache.log4j.Logger;
 
 import java.net.DatagramSocket;
 import java.util.List;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
  */
 public class MembersResponseChecker implements Runnable
 {
+    private static final Logger LOG = Logger.getLogger(MembersResponseChecker.class);
+
     private static final int TIMEOUT = 5 * 1000;
 
     private MessageConsumer consumer;
@@ -35,6 +38,23 @@ public class MembersResponseChecker implements Runnable
 
     private SignatureHandler signatureHandler;
 
+    /**
+     * Initialise a checker to ensure all current memebrs respond, if not update everyone and trigger a leader election
+     * (if the leader is not responding)
+     *
+     * @param consumer
+     *          the {@link MessageConsumer} to retrieve the members to check accepted
+     * @param members
+     *          the current list of members
+     * @param thisNode
+     *          the information for this node being run
+     * @param socket
+     *          the socket to send messages across on
+     * @param election
+     *          the implementation of {@link LeaderElection} to initiate elections when the leader is un-responsive
+     * @param signatureHandler
+     *          the handler for ensuring digital signatures are verified
+     */
     public MembersResponseChecker(MessageConsumer consumer, Members members, Member thisNode, DatagramSocket socket,
                                   LeaderElection election, SignatureHandler signatureHandler)
     {
@@ -49,6 +69,8 @@ public class MembersResponseChecker implements Runnable
     @Override
     public void run()
     {
+        LOG.debug("Waiting for responses from other members ensuring they are all alive.");
+
         // check for all the members who have not responded after a defined delay timeout
         new Timer().schedule(
                 new TimerTask()
@@ -59,10 +81,7 @@ public class MembersResponseChecker implements Runnable
                         List<Member> remaining = consumer.getMembersToCheckAccepted();
                         if (!remaining.isEmpty())
                         {
-                            System.out.println("MEMBERS NOT RESPONDING");
-                            System.out.println("-------------------------------");
-                            remaining.forEach(System.out::println);
-                            System.out.println("-------------------------------");
+                            LOG.debug("Previous members are not responding: " + remaining);
 
                             // send updated list to all other members
                             members.removeMembers(remaining);
@@ -74,10 +93,10 @@ public class MembersResponseChecker implements Runnable
                                     .filter(member -> member instanceof Leader)
                                     .collect(Collectors.toList());
 
-                            System.out.println(remaining.toString());
                             if (!anyLeader.isEmpty())
                             {
-                                System.out.println("Starting leader election");
+                                LOG.debug("Leader not responding: " + anyLeader);
+
                                 // trigger leader election here
                                 election.initiate();
                             }

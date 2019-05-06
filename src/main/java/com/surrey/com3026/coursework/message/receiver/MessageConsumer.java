@@ -9,6 +9,7 @@ import com.surrey.com3026.coursework.message.sender.AcceptJoiner;
 import com.surrey.com3026.coursework.message.sender.NewJoiner;
 import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
 import com.surrey.com3026.coursework.security.SignatureHandler;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -23,6 +24,8 @@ import java.util.concurrent.BlockingQueue;
  */
 public class MessageConsumer implements Runnable
 {
+    private static final Logger LOG = Logger.getLogger(MessageConsumer.class);
+
     private BlockingQueue messageQueue;
 
     private Members members;
@@ -81,23 +84,20 @@ public class MessageConsumer implements Runnable
 
                 if (signatureHandler.verify(responderId, signature, message.toString().getBytes()))
                 {
-                    System.out.println("Signature verified from node " + responderId);
+                    LOG.debug("Signature verified from node " + responderId);
                     handleMessageType(message);
                 }
                 else
                 {
                     // Ignore the message since it could not be verified
                     // Log this fact to the console to show why the message was ignored
-                    System.out.println("Unable to verify signature from node " + responderId);
-                    System.out.println(new String(signature));
-                    System.out.println(message.toString());
+                    LOG.error("Unable to verify signature from node " + responderId + ", message ignored");
                 }
-
             }
         }
         catch (InterruptedException | IOException e)
         {
-            e.printStackTrace();
+            LOG.error("Exception thrown when consuming messages: ", e);
         }
     }
 
@@ -112,6 +112,8 @@ public class MessageConsumer implements Runnable
      */
     private void handleMessageType(Message message) throws UnknownHostException
     {
+        LOG.debug(message.getType() + " message received from: " + message.getResponder());
+
         // send a message to the joiner with info on all current members
         if (message.getType().equals(MessageTypes.JOIN_REQUEST))
         {
@@ -120,11 +122,7 @@ public class MessageConsumer implements Runnable
             // update this nodes list of members with the new joiner
             members.addMember(newJoiner);
 
-            System.out.println("RECEIVED JOIN REQUEST");
-            System.out.println("------------------------");
-            System.out.println(members.toString());
-            System.out.println("------------------------");
-
+            LOG.debug("The current members are now: " + members);
 
             SendAllCurrentMembers sender = new SendAllCurrentMembers(members, newJoiner.getIp(),
                     newJoiner.getPortNumber(), thisNode, socket, signatureHandler);
@@ -136,10 +134,7 @@ public class MessageConsumer implements Runnable
             // update this nodes list of members with the new joiner
             members.addMember(newJoiner);
 
-            System.out.println("NEW MEMBER JOINED");
-            System.out.println("------------------------");
-            System.out.println(members.toString());
-            System.out.println("------------------------");
+            LOG.debug("The current members are now: " + members);
 
             // send accept_joiner
             // need to check that all these accepted messages are received
@@ -152,10 +147,7 @@ public class MessageConsumer implements Runnable
             List<Member> currentMembers = message.getMembers();
             members.setMembers(currentMembers);
 
-            System.out.println("CURRENT MEMBERS LIST RECEIVED");
-            System.out.println("-------------------------------");
-            System.out.println(members.toString());
-            System.out.println("-------------------------------");
+            LOG.debug("The current members received are: " + members);
 
             // send update members message to everyone
             // except this node and the node we just got the all_members message from
@@ -168,18 +160,14 @@ public class MessageConsumer implements Runnable
         }
         else if (message.getType().equals(MessageTypes.ACCEPT_JOINER))
         {
-            System.out.println("MEMBER HAS ACCEPTED ME");
-            System.out.println("------------------------");
-            System.out.println(message.getResponder().toString());
+            LOG.debug("Member has accepted me to joining the group: " + message.getResponder());
+
+            // remove from the list for checking all members are alive
             this.removeMemberAccepted(message.getResponder());
-            System.out.println("------------------------");
         }
         else if (message.getType().equals(MessageTypes.UPDATE_MEMBERS))
         {
-            System.out.println("UPDATING MEMBERS");
-            System.out.println("------------------------");
-            System.out.println(message.getMembers().toString());
-            System.out.println("------------------------");
+            LOG.debug("Updating the current members list to: " + message.getMembers());
 
             // updating the members list to the current members
             // due to some not responding
@@ -191,7 +179,7 @@ public class MessageConsumer implements Runnable
             // just sends this current list of members back
             Member responder = message.getResponder();
 
-            System.out.println(members.toString());
+            LOG.debug("Sending current members list to: " + responder);
 
             SendAllCurrentMembers sender = new SendAllCurrentMembers(members, responder.getIp(),
                     responder.getPortNumber(), thisNode, socket, signatureHandler);

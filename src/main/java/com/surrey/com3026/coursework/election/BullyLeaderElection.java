@@ -7,6 +7,7 @@ import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 import com.surrey.com3026.coursework.security.SignatureHandler;
+import org.apache.log4j.Logger;
 
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
  */
 public class BullyLeaderElection implements LeaderElection
 {
+    private static final Logger LOG = Logger.getLogger(BullyElectionSender.class);
+
     private static final int TIMEOUT = 5 * 1000;
 
     private static final String ELECTION_INITIATE = "election_initiate";
@@ -68,26 +71,16 @@ public class BullyLeaderElection implements LeaderElection
     @Override
     public void initiate()
     {
+        LOG.debug("Leader election initiated");
         List<Member> higherIdMembers = getMembersWithHigherId(thisNode);
-
-        System.out.println("<-------------------->");
-        System.out.println(higherIdMembers);
-        System.out.println("<-------------------->");
 
         // check if thisNode has the highest process ID in the list
         if (higherIdMembers.isEmpty())
         {
-            try
-            {
-                // update this node to coordinator in this nodes members list
-                // send victory message to all
-                System.out.println("No higher id members");
-                sendVictory();
-            }
-            catch (UnknownHostException e)
-            {
-                e.printStackTrace();
-            }
+            // update this node to coordinator in this nodes members list
+            // send victory message to all
+            LOG.debug("No higher ID members found in current members list");
+            sendVictory();
         }
         else
         {
@@ -105,7 +98,6 @@ public class BullyLeaderElection implements LeaderElection
     @Override
     public void handleElectionMessage(Message message)
     {
-        System.out.println(message.getType());
         if (waitingForResponses)
         {
             this.receivedElectionMessages.add(message);
@@ -114,7 +106,6 @@ public class BullyLeaderElection implements LeaderElection
         {
             if (message.getType().equals(ELECTION_VICTORY))
             {
-                System.out.println("Received ELECTION VICTORY");
                 complete((Leader) message.getResponder());
             }
             else if (message.getType().equals(ELECTION_INITIATE))
@@ -126,9 +117,10 @@ public class BullyLeaderElection implements LeaderElection
                         ELECTION_ALIVE, Collections.singletonList(electionInitiator));
                 new Thread(sender).start();
 
-                System.out.println("Got election initiate message from " + electionInitiator.getId());
                 if (electionInitiator.getId() < thisNode.getId())
                 {
+                    LOG.debug("Election initiator has lower ID, so re-initiating election process.");
+
                     // lower ID = restart process
                     this.initiate();
                 }
@@ -193,15 +185,8 @@ public class BullyLeaderElection implements LeaderElection
                             // to complete the algorithm
                             if (membersResponded.isEmpty())
                             {
-                                try
-                                {
-                                    System.out.println("Waited for responses");
-                                    sendVictory();
-                                }
-                                catch (UnknownHostException e)
-                                {
-                                    e.printStackTrace();
-                                }
+                                LOG.debug("Waited for responses and no member has");
+                                sendVictory();
                             }
 
                             // update all others lists to remove those who are not responding
@@ -228,10 +213,8 @@ public class BullyLeaderElection implements LeaderElection
      * Sending a victory message to all other nodes, to update their list of members for this node
      * as the new leader, completing the algorithm
      *
-     * @throws UnknownHostException
-     *          if the host of the leader is unknown
      */
-    private void sendVictory() throws UnknownHostException
+    private void sendVictory()
     {
         Leader newLeader = new Leader(thisNode.getId(), thisNode.getPortNumber());
 
@@ -245,9 +228,8 @@ public class BullyLeaderElection implements LeaderElection
     @Override
     public void complete(Leader leader)
     {
-        System.out.println("LEADER ELECTION COMPLETE");
-        System.out.println("New leader: " + leader.toString());
-
+        LOG.debug("Leader election complete");
+        LOG.debug("New leader has been elected: " + leader.toString());
 
         // clear the list of received messages to allow for the next potential election in the future
         receivedElectionMessages.clear();
@@ -255,7 +237,6 @@ public class BullyLeaderElection implements LeaderElection
         // change members list and thisNode to a leader object (if appropriate)
         if (thisNode.equals(leader))
         {
-            // TODO need to change this, setter in MessageReceiver for thisNode?
             thisNode = leader;
         }
 
@@ -268,8 +249,8 @@ public class BullyLeaderElection implements LeaderElection
                 members.replaceMember(i, leader);
             }
         }
-        System.out.println(members.toString());
 
+        LOG.debug("Current list of members is now: " + members);
     }
 
 
@@ -320,7 +301,7 @@ public class BullyLeaderElection implements LeaderElection
          *          the list of members to send the message to
          */
         BullyElectionSender(Members members, Member thisNode, DatagramSocket socket, SignatureHandler signatureHandler,
-                                   String messageType, List<Member> memberToMessage)
+                            String messageType, List<Member> memberToMessage)
         {
             super(members, thisNode, socket, signatureHandler);
             this.messageType = messageType;

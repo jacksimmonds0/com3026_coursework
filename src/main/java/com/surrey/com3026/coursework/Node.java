@@ -10,6 +10,7 @@ import com.surrey.com3026.coursework.message.receiver.MessageReceiver;
 import com.surrey.com3026.coursework.message.sender.JoinRequest;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
+import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -29,6 +31,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Node
 {
+    private static final Logger LOG = Logger.getLogger(Node.class);
+
     private static final int QUEUE_CAPACITY = 20;
 
     private Member thisNode;
@@ -74,6 +78,8 @@ public class Node
         Members members = new Members();
         members.addMember(thisNode);
 
+        LOG.debug("Node has been started");
+
         try
         {
             KeyStore keyStore = getThisNodesKeyStore();
@@ -88,13 +94,18 @@ public class Node
                 InetAddress prevAddress = InetAddress.getByName(prevMemberSplit[0]);
                 int prevPort = Integer.parseInt(prevMemberSplit[1]);
 
+                LOG.debug("Attempting to contact previous member " + prevMember + " with a join request");
                 JoinRequest sender = new JoinRequest(members, prevAddress, prevPort, thisNode, socket, signatureHandler);
                 new Thread(sender).start();
             }
         }
-        catch (IOException e)
+        catch (SocketException e)
         {
-            e.printStackTrace();
+            LOG.error("Error attempting to initialise node threads: ", e);
+        }
+        catch (UnknownHostException e)
+        {
+            LOG.error("Error attempting to get IP from previous member information entered on startup: ", e);
         }
     }
 
@@ -145,7 +156,8 @@ public class Node
         }
         catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e)
         {
-            e.printStackTrace();
+            LOG.error("Error attempting to read the keystore from file based on ID (" +
+                    thisNode.getId() + "): ", e);
         }
 
         return keyStore;

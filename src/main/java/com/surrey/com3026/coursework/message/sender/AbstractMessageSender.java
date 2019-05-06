@@ -4,6 +4,7 @@ import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.security.SignatureHandler;
+import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -22,6 +23,8 @@ import java.util.List;
  */
 public abstract class AbstractMessageSender
 {
+    private static final Logger LOG = Logger.getLogger(AbstractMessageSender.class);
+
     protected Members members;
 
     protected InetAddress address;
@@ -47,6 +50,18 @@ public abstract class AbstractMessageSender
         this.signatureHandler = signatureHandler;
     }
 
+    /**
+     * Constructor for fields required to send messages to other nodes
+     *
+     * @param members
+     *          the current list of members
+     * @param thisNode
+     *          information on the node this is running on
+     * @param socket
+     *          the {@link DatagramSocket} to send messages on
+     * @param signatureHandler
+     *          the handler for signing digital signatures
+     */
     public AbstractMessageSender(Members members, Member thisNode, DatagramSocket socket,
                                  SignatureHandler signatureHandler)
     {
@@ -56,6 +71,24 @@ public abstract class AbstractMessageSender
         this.signatureHandler = signatureHandler;
     }
 
+    /**
+     * Constructor for fields required to send messages to other nodes
+     *
+     * @param members
+     *          the current list of members
+     * @param thisNode
+     *          information on the node this is running on
+     * @param address
+     *          the {@link InetAddress} to send the message to
+     * @param port
+     *          the port number of the node the message is being sent to
+     * @param thisNode
+     *          information on the node this is running on
+     * @param socket
+     *          the {@link DatagramSocket} to send messages on
+     * @param signatureHandler
+     *          the handler for signing digital signatures
+     */
     public AbstractMessageSender(Members members, InetAddress address, int port, Member thisNode,
                                  DatagramSocket socket, SignatureHandler signatureHandler)
     {
@@ -64,13 +97,24 @@ public abstract class AbstractMessageSender
         this.port = port;
     }
 
-
+    /**
+     * Sends a message to another node with a known IP address and port number
+     *
+     * @param address
+     *          the IP address to send the message to
+     * @param port
+     *          the port number to send the message to
+     * @param message
+     *          the {@link Message} object to be sent (marshalled)
+     */
     protected void sendMessage(InetAddress address, int port, Message message)
     {
-        // TODO change this to a class variable?
+        LOG.debug("Sending message to: " + address.getHostAddress() + ":" + port);
+        LOG.debug("Message being sent: " + message);
+        LOG.debug("Signing the hashed message with private key");
 
         // set signature using message toString method
-        // within this class uses HMAC for hashing the message before signing with private key
+        // within this class the message is hashed using SHA-256 before signing with this nodes private key
         message.setSignature(signatureHandler.sign(message.toString().getBytes()));
 
         String messageString = this.getMarshalledMessage(message);
@@ -87,10 +131,17 @@ public abstract class AbstractMessageSender
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.error("Error while attempting to send the message on socket", e);
         }
     }
 
+    /**
+     * Marshall the message to XML before sending across within a packet
+     *
+     * @param message
+     *          the object to serialize to XML
+     * @return the String of the serialized message object
+     */
     private String getMarshalledMessage(Message message)
     {
         String messageString = "";
@@ -107,12 +158,20 @@ public abstract class AbstractMessageSender
         }
         catch (JAXBException e)
         {
-            e.printStackTrace();
+            LOG.error("Error while marshalling the message to be sent", e);
         }
 
         return messageString;
     }
 
+    /**
+     * Helper method to send a message to multiple members
+     *
+     * @param message
+     *          the message to send
+     * @param membersToMessage
+     *          the {@link List} of members to send the message to
+     */
     protected void sendMessageToMultipleMembers(Message message, List<Member> membersToMessage)
     {
         for(Member m : membersToMessage)
@@ -124,13 +183,19 @@ public abstract class AbstractMessageSender
             }
             catch (UnknownHostException e)
             {
-                e.printStackTrace();
+                LOG.error("Unknown IP host address from member: " + m, e);
             }
 
             sendMessage(mAddress, m.getPortNumber(), message);
         }
     }
 
+    /**
+     * Broadcast the message to all other members within the current {@link Members} list
+     *
+     * @param message
+     *          the {@link Message} to broadcast
+     */
     protected void broadcastMessage(Message message)
     {
         // broadcasting a message to all other members, so exclude this node

@@ -1,6 +1,7 @@
 package com.surrey.com3026.coursework.security;
 
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
+import org.apache.log4j.Logger;
 
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
@@ -19,6 +20,8 @@ import java.security.cert.Certificate;
  */
 public class SignatureHandler
 {
+    private static final Logger LOG = Logger.getLogger(SignatureHandler.class);
+
     private static final String SHA_256 = "SHA-256";
 
     private KeyStore keyStore;
@@ -55,7 +58,7 @@ public class SignatureHandler
         catch (NoSuchAlgorithmException | NoSuchProviderException | KeyStoreException | UnrecoverableKeyException
                 | InvalidKeyException | SignatureException e)
         {
-            e.printStackTrace();
+            LOG.error("Error attempting to sign the message: ", e);
         }
 
         return null;
@@ -88,7 +91,7 @@ public class SignatureHandler
         catch (KeyStoreException | NoSuchAlgorithmException | NoSuchProviderException
                 | SignatureException | InvalidKeyException e)
         {
-            e.printStackTrace();
+            LOG.error("Error attempting to verify the message signature from " + nodeId, e);
         }
 
         return false;

@@ -72,14 +72,14 @@ public class Message
     {
         if (members != null)
         {
-            return "{ type=" + type +
+            return "{type=" + type +
                     ", members=" + members.toString() +
                     ", responder=" + responder.toString() +
                     "}";
         }
         else
         {
-            return "{ type=" + type +
+            return "{type=" + type +
                     ", responder=" + responder.toString() +
                     "}";
         }

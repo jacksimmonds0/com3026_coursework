@@ -1,6 +1,7 @@
 package com.surrey.com3026.coursework.message.receiver;
 
 import com.surrey.com3026.coursework.message.Message;
+import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,6 +18,8 @@ import java.util.concurrent.BlockingQueue;
  */
 public class MessageReceiver implements Runnable
 {
+    private static final Logger LOG = Logger.getLogger(MessageReceiver.class);
+
     private static final int BUFFER_SIZE = 4096;
 
     private BlockingQueue messageQueue;
@@ -66,7 +69,7 @@ public class MessageReceiver implements Runnable
         }
         catch (IOException | JAXBException | InterruptedException e)
         {
-            e.printStackTrace();
+            LOG.error("Error receiving a message: ", e);
         }
     }
 
