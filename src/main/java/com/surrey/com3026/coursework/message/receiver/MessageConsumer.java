@@ -11,7 +11,11 @@ import com.surrey.com3026.coursework.message.sender.SendAllCurrentMembers;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 import org.apache.log4j.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.DatagramSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -86,6 +90,9 @@ public class MessageConsumer implements Runnable
                 {
                     LOG.debug("Signature verified from node " + responderId);
                     handleMessageType(message);
+
+                    // after every message received log the current members list
+                    logCurrentMembers();
                 }
                 else
                 {
@@ -160,10 +167,10 @@ public class MessageConsumer implements Runnable
         }
         else if (message.getType().equals(MessageTypes.ACCEPT_JOINER))
         {
-            LOG.debug("Member has accepted me to joining the group: " + message.getResponder());
+            LOG.debug("Member has accepted me in joining the group: " + message.getResponder());
 
             // remove from the list for checking all members are alive
-            this.removeMemberAccepted(message.getResponder());
+            membersToCheckAccepted.remove(message.getResponder());
         }
         else if (message.getType().equals(MessageTypes.UPDATE_MEMBERS))
         {
@@ -207,8 +214,24 @@ public class MessageConsumer implements Runnable
         this.membersToCheckAccepted = membersToCheckAccepted;
     }
 
-    private void removeMemberAccepted(Member member)
+    /**
+     * Log the JAXB members object to the node log, acting as a checkpoint for recovery
+     */
+    private void logCurrentMembers()
     {
-        membersToCheckAccepted.remove(member);
+        try
+        {
+            JAXBContext context = JAXBContext.newInstance(Members.class);
+
+            Marshaller marshallObj = context.createMarshaller();
+            StringWriter dataWriter = new StringWriter();
+            marshallObj.marshal(members, dataWriter);
+
+            LOG.debug(dataWriter.toString());
+        }
+        catch (JAXBException e)
+        {
+            LOG.error("Error while marshalling the current members to be log", e);
+        }
     }
 }

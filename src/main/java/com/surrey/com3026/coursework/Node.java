@@ -8,6 +8,8 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.receiver.MessageReceiver;
 import com.surrey.com3026.coursework.message.sender.JoinRequest;
+import com.surrey.com3026.coursework.message.sender.NewJoiner;
+import com.surrey.com3026.coursework.recovery.LogCheckpoint;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
 import org.apache.log4j.Logger;
@@ -40,6 +42,10 @@ public class Node
     private String prevMember;
 
     private DatagramSocket socket;
+
+    private MessageConsumer consumer;
+
+    private LeaderElection election;
 
     /**
      * Constructor for creating this node as a {@link Leader}
@@ -84,10 +90,20 @@ public class Node
         {
             KeyStore keyStore = getThisNodesKeyStore();
             SignatureHandler signatureHandler = new SignatureHandler(keyStore);
-
             this.initialiseThreads(members, signatureHandler);
 
-            if (prevMember != null)
+            // attempt to retrieve from the checkpoint within the log file
+            LogCheckpoint checkpoint = new LogCheckpoint(members);
+            boolean checkpointFound = checkpoint.getLastMembersFromLogFile();
+
+            if (checkpointFound)
+            {
+                // send message to everyone indicating the re-joining
+                NewJoiner sender = new NewJoiner(members, thisNode, socket, null, consumer,
+                        election, signatureHandler);
+                new Thread(sender).start();
+            }
+            else if (prevMember != null)
             {
                 // use previous member to retrieve all current members list to update
                 String[] prevMemberSplit = prevMember.split(":");
@@ -137,6 +153,9 @@ public class Node
         MessageConsumer consumer = new MessageConsumer(messageQueue, members, socket, election,
                 thisNode, signatureHandler);
         new Thread(consumer).start();
+
+        this.consumer = consumer;
+        this.election = election;
     }
 
     /**

@@ -36,7 +36,11 @@ public class NewJoiner extends AbstractMessageSender implements Runnable
         // exclude this node and the initial join_request responder node
         List<Member> membersToMessage = new ArrayList<>(members.getMembers());
         membersToMessage.remove(thisNode);
-        membersToMessage.remove(responder);
+
+        if (responder != null)
+        {
+            membersToMessage.remove(responder);
+        }
 
         if(membersToMessage.isEmpty())
         {

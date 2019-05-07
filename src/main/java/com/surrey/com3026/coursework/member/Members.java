@@ -1,5 +1,9 @@
 package com.surrey.com3026.coursework.member;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,8 +11,11 @@ import java.util.stream.Collectors;
 /**
  * Class holding information on the current members in the group network
  */
+@XmlRootElement(name = "members")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Members
 {
+    @XmlElement
     private List<Member> members;
 
     /**

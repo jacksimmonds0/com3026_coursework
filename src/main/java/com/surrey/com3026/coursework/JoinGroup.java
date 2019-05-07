@@ -24,8 +24,8 @@ public class JoinGroup
         {
             String prevMemberInfo = args[2];
             node = new Node(id, portNumber, prevMemberInfo);
-            LOG.debug("Member created with id=" + id + ", port=" + portNumber + " - will attempt to join by" +
-                    "contacting: " + prevMemberInfo);
+            LOG.debug("Member created with id=" + id + ", port=" + portNumber + " - will attempt to join by " +
+                    "contacting the node on " + prevMemberInfo);
         }
         else
         {
