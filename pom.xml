@@ -28,6 +28,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- For copying files required for testing -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -40,6 +48,9 @@
                             <mainClass>com.surrey.com3026.coursework.JoinGroup</mainClass>
                         </manifest>
                     </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
             </plugin>
         </plugins>

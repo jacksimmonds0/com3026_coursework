@@ -6,12 +6,15 @@ import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +30,9 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Abstract class to hold the common methods and fields for integration testing of nodes joining the group
@@ -41,6 +46,8 @@ public abstract class AbstractNodeTester
 
     protected static final int TESTER_ID = 20;
 
+    protected static final String LOG_FILENAME = "node.log";
+
     private List<Node> nodesInUse;
 
     protected DatagramSocket socket;
@@ -50,13 +57,16 @@ public abstract class AbstractNodeTester
     {
         this.nodesInUse = new ArrayList<>();
         this.socket = new DatagramSocket(8999);
+
+        // disable logging (unless overridden)
+        Logger.getLogger("com.surrey.com3026.coursework").setLevel(Level.OFF);
     }
 
     /**
      * Create a node based on the arguments
      *
      * @param args
-     *          the varargs for the node, 2 or 3 otherwise IllegalArgumentExeption is thrown (test fails)
+     *          the varargs for the node, 2 or 3 otherwise IllegalArgumentException is thrown (test fails)
      * @return the created {@link Node}
      */
     protected Node createNode(String... args)
@@ -176,10 +186,27 @@ public abstract class AbstractNodeTester
         return keyStore;
     }
 
+    /**
+     * Helper method for assert two lists of members (regardless of order)
+     *
+     * @param expectedMembers
+     *          the expected list of members to be returned
+     * @param actualMembers
+     *          the actual list of members received from the node
+     */
+    protected void assertMembersListSame(List<Member> expectedMembers, List<Member> actualMembers)
+    {
+        assertNotNull(actualMembers);
+        assertTrue(expectedMembers.size() == actualMembers.size() &&
+                expectedMembers.containsAll(actualMembers) && actualMembers.containsAll(expectedMembers));
+    }
+
 
     @After
     public void tearDown()
     {
+        Logger.getLogger("com.surrey.com3026.coursework").setLevel(Level.OFF);
+
         // after each test, close all sockets in use
         for (Node n : nodesInUse)
         {
@@ -187,6 +214,10 @@ public abstract class AbstractNodeTester
         }
         nodesInUse.clear();
         this.socket.close();
+
+        // delete log file so checkpoints not used
+        File nodeLog = new File(LOG_FILENAME);
+        boolean deleted = nodeLog.delete();
     }
 
 

@@ -1,0 +1,95 @@
+2019-05-07 14:42:20 DEBUG Node:87 - Node 1 has been started
+2019-05-07 14:42:20 DEBUG LogCheckpoint:74 - No checkpoint found in log file.
+2019-05-07 14:42:21 DEBUG Node:87 - Node 2 has been started
+2019-05-07 14:42:21 DEBUG LogCheckpoint:74 - No checkpoint found in log file.
+2019-05-07 14:42:21 DEBUG Node:113 - Attempting to contact previous member 127.0.0.1:8001 with a join request
+2019-05-07 14:42:21 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8001
+2019-05-07 14:42:21 DEBUG AbstractMessageSender:113 - Message being sent: {type=join_request, responder={id=2, ipAddress=127.0.0.1, portNumber=8002}}
+2019-05-07 14:42:21 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:21 DEBUG MessageConsumer:91 - Signature verified from node 2
+2019-05-07 14:42:21 DEBUG MessageConsumer:122 - join_request message received from: {id=2, ipAddress=127.0.0.1, portNumber=8002}
+2019-05-07 14:42:21 DEBUG MessageConsumer:132 - The current members are now: [{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}]
+2019-05-07 14:42:21 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8002
+2019-05-07 14:42:21 DEBUG AbstractMessageSender:113 - Message being sent: {type=current_members, members=[{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}], responder={id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}}
+2019-05-07 14:42:21 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:21 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>
+2019-05-07 14:42:22 DEBUG MessageConsumer:91 - Signature verified from node 1
+2019-05-07 14:42:22 DEBUG MessageConsumer:122 - current_members message received from: {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}
+2019-05-07 14:42:22 DEBUG MessageConsumer:157 - The current members received are: [{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}]
+2019-05-07 14:42:22 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>
+2019-05-07 14:42:22 DEBUG Node:87 - Node 3 has been started
+2019-05-07 14:42:22 DEBUG LogCheckpoint:66 - Members retrieved from checkpoint: [{id=3, ipAddress=127.0.0.1, portNumber=8003}, {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}]
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8001
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:113 - Message being sent: {type=new_joiner, responder={id=3, ipAddress=127.0.0.1, portNumber=8003}}
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8002
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:113 - Message being sent: {type=new_joiner, responder={id=3, ipAddress=127.0.0.1, portNumber=8003}}
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:22 DEBUG MembersResponseChecker:74 - Waiting for responses from other members ensuring they are all alive.
+2019-05-07 14:42:22 DEBUG MessageConsumer:91 - Signature verified from node 3
+2019-05-07 14:42:22 DEBUG MessageConsumer:122 - new_joiner message received from: {id=3, ipAddress=127.0.0.1, portNumber=8003}
+2019-05-07 14:42:22 DEBUG MessageConsumer:144 - The current members are now: [{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}, {id=3, ipAddress=127.0.0.1, portNumber=8003}]
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8003
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:113 - Message being sent: {type=accept_joiner, responder={id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}}
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:22 DEBUG MessageConsumer:91 - Signature verified from node 3
+2019-05-07 14:42:22 DEBUG MessageConsumer:122 - new_joiner message received from: {id=3, ipAddress=127.0.0.1, portNumber=8003}
+2019-05-07 14:42:22 DEBUG MessageConsumer:144 - The current members are now: [{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}, {id=3, ipAddress=127.0.0.1, portNumber=8003}]
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8003
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:113 - Message being sent: {type=accept_joiner, responder={id=2, ipAddress=127.0.0.1, portNumber=8002}}
+2019-05-07 14:42:22 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:22 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members></members>
+2019-05-07 14:42:22 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members></members>
+2019-05-07 14:42:22 DEBUG MessageConsumer:91 - Signature verified from node 2
+2019-05-07 14:42:22 DEBUG MessageConsumer:122 - accept_joiner message received from: {id=2, ipAddress=127.0.0.1, portNumber=8002}
+2019-05-07 14:42:22 DEBUG MessageConsumer:170 - Member has accepted me in joining the group: {id=2, ipAddress=127.0.0.1, portNumber=8002}
+2019-05-07 14:42:22 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>
+2019-05-07 14:42:22 DEBUG MessageConsumer:91 - Signature verified from node 1
+2019-05-07 14:42:22 DEBUG MessageConsumer:122 - accept_joiner message received from: {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}
+2019-05-07 14:42:22 DEBUG MessageConsumer:170 - Member has accepted me in joining the group: {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}
+2019-05-07 14:42:22 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>
+2019-05-07 14:42:28 DEBUG Node:87 - Node 4 has been started
+2019-05-07 14:42:28 DEBUG LogCheckpoint:66 - Members retrieved from checkpoint: [{id=4, ipAddress=127.0.0.1, portNumber=8004}, {id=3, ipAddress=127.0.0.1, portNumber=8003}, {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}]
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8003
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:113 - Message being sent: {type=new_joiner, responder={id=4, ipAddress=127.0.0.1, portNumber=8004}}
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8001
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:113 - Message being sent: {type=new_joiner, responder={id=4, ipAddress=127.0.0.1, portNumber=8004}}
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8002
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:113 - Message being sent: {type=new_joiner, responder={id=4, ipAddress=127.0.0.1, portNumber=8004}}
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:28 DEBUG MessageConsumer:91 - Signature verified from node 4
+2019-05-07 14:42:28 DEBUG MessageConsumer:122 - new_joiner message received from: {id=4, ipAddress=127.0.0.1, portNumber=8004}
+2019-05-07 14:42:28 DEBUG MessageConsumer:144 - The current members are now: [{id=3, ipAddress=127.0.0.1, portNumber=8003}, {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}, {id=4, ipAddress=127.0.0.1, portNumber=8004}]
+2019-05-07 14:42:28 DEBUG MembersResponseChecker:74 - Waiting for responses from other members ensuring they are all alive.
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8004
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:113 - Message being sent: {type=accept_joiner, responder={id=3, ipAddress=127.0.0.1, portNumber=8003}}
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:28 DEBUG MessageConsumer:91 - Signature verified from node 4
+2019-05-07 14:42:28 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members><members id="4"><ipAddress>127.0.0.1</ipAddress><portNumber>8004</portNumber></members></members>
+2019-05-07 14:42:28 DEBUG MessageConsumer:122 - new_joiner message received from: {id=4, ipAddress=127.0.0.1, portNumber=8004}
+2019-05-07 14:42:28 DEBUG MessageConsumer:144 - The current members are now: [{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}, {id=3, ipAddress=127.0.0.1, portNumber=8003}, {id=4, ipAddress=127.0.0.1, portNumber=8004}]
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8004
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:113 - Message being sent: {type=accept_joiner, responder={id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}}
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:28 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members id="4"><ipAddress>127.0.0.1</ipAddress><portNumber>8004</portNumber></members></members>
+2019-05-07 14:42:28 DEBUG MessageConsumer:91 - Signature verified from node 4
+2019-05-07 14:42:28 DEBUG MessageConsumer:122 - new_joiner message received from: {id=4, ipAddress=127.0.0.1, portNumber=8004}
+2019-05-07 14:42:28 DEBUG MessageConsumer:144 - The current members are now: [{id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}, {id=2, ipAddress=127.0.0.1, portNumber=8002}, {id=3, ipAddress=127.0.0.1, portNumber=8003}, {id=4, ipAddress=127.0.0.1, portNumber=8004}]
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:112 - Sending message to: 127.0.0.1:8004
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:113 - Message being sent: {type=accept_joiner, responder={id=2, ipAddress=127.0.0.1, portNumber=8002}}
+2019-05-07 14:42:28 DEBUG AbstractMessageSender:114 - Signing the hashed message with private key
+2019-05-07 14:42:28 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members id="4"><ipAddress>127.0.0.1</ipAddress><portNumber>8004</portNumber></members></members>
+2019-05-07 14:42:28 DEBUG MessageConsumer:91 - Signature verified from node 3
+2019-05-07 14:42:28 DEBUG MessageConsumer:122 - accept_joiner message received from: {id=3, ipAddress=127.0.0.1, portNumber=8003}
+2019-05-07 14:42:28 DEBUG MessageConsumer:170 - Member has accepted me in joining the group: {id=3, ipAddress=127.0.0.1, portNumber=8003}
+2019-05-07 14:42:28 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members id="4"><ipAddress>127.0.0.1</ipAddress><portNumber>8004</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>
+2019-05-07 14:42:28 DEBUG MessageConsumer:91 - Signature verified from node 1
+2019-05-07 14:42:28 DEBUG MessageConsumer:122 - accept_joiner message received from: {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}
+2019-05-07 14:42:28 DEBUG MessageConsumer:170 - Member has accepted me in joining the group: {id=1, ipAddress=127.0.0.1, portNumber=8001, isLeader=true}
+2019-05-07 14:42:28 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members id="4"><ipAddress>127.0.0.1</ipAddress><portNumber>8004</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>
+2019-05-07 14:42:28 DEBUG MessageConsumer:91 - Signature verified from node 2
+2019-05-07 14:42:28 DEBUG MessageConsumer:122 - accept_joiner message received from: {id=2, ipAddress=127.0.0.1, portNumber=8002}
+2019-05-07 14:42:28 DEBUG MessageConsumer:170 - Member has accepted me in joining the group: {id=2, ipAddress=127.0.0.1, portNumber=8002}
+2019-05-07 14:42:28 DEBUG MessageConsumer:230 - <?xml version="1.0" encoding="UTF-8" standalone="yes"?><members><members id="4"><ipAddress>127.0.0.1</ipAddress><portNumber>8004</portNumber></members><members id="3"><ipAddress>127.0.0.1</ipAddress><portNumber>8003</portNumber></members><members xsi:type="leader" id="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ipAddress>127.0.0.1</ipAddress><portNumber>8001</portNumber><isLeader>true</isLeader></members><members id="2"><ipAddress>127.0.0.1</ipAddress><portNumber>8002</portNumber></members></members>

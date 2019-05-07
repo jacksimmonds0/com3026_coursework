@@ -14,6 +14,10 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test cases to ensure the program is fault tolerant via leader election, as a new leader is elected correctly and all
+ * nodes have the same leader after the election has been conducted.
+ */
 public class FaultTolerance_IT extends AbstractNodeTester
 {
 

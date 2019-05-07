@@ -47,8 +47,14 @@ public class LogCheckpoint
             for (int i = logFile.size() - 1; i >= 0; i--)
             {
                 String line = logFile.get(i);
-                String logMessage = line.split(" - ")[1];
+                String[] logSplit = line.split(" - ");
 
+                if (logSplit.length != 2)
+                {
+                    continue;
+                }
+
+                String logMessage = logSplit[1];
                 if (logMessage.startsWith("<?xml"))
                 {
                     List<Member> currentMembers = unmarshallMembersFromLog(logMessage).getMembers();

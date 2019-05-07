@@ -22,6 +22,10 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test cases to ensure the digital signature scheme works as intended, no message returned if either the integrity check
+ * or the signature itself is wrong, and that a message is returned when both are correct
+ */
 public class Security_IT extends AbstractNodeTester
 {
     @Test
