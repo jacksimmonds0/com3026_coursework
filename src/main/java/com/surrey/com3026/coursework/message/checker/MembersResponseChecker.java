@@ -24,7 +24,9 @@ public class MembersResponseChecker implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(MembersResponseChecker.class);
 
-    private static final int TIMEOUT = 5 * 1000;
+    private static final int TIMEOUT = 5000;
+
+    private static final int SHORT_TIMEOUT = 200;
 
     private MessageConsumer consumer;
 
@@ -78,33 +80,55 @@ public class MembersResponseChecker implements Runnable
                     @Override
                     public void run()
                     {
-                        List<Member> remaining = consumer.getMembersToCheckAccepted();
-                        if (!remaining.isEmpty())
+                        List<Member> notResponding = consumer.getMembersToCheckAccepted();
+                        if (!notResponding.isEmpty())
                         {
-                            LOG.debug("Previous members are not responding: " + remaining);
+                            LOG.debug("Previous members are not responding: " + notResponding);
 
                             // send updated list to all other members
-                            members.removeMembers(remaining);
+                            members.removeMembers(notResponding);
+                            LOG.debug("Members updated to: " + members);
                             UpdateMembers sender = new UpdateMembers(members, thisNode, socket, signatureHandler);
                             new Thread(sender).start();
 
-                            // see if any of the non-responsive previous members was the leader/coordinator
-                            List<Member> anyLeader = remaining.stream()
-                                    .filter(member -> member instanceof Leader)
-                                    .collect(Collectors.toList());
-
-                            if (!anyLeader.isEmpty())
-                            {
-                                LOG.debug("Leader not responding: " + anyLeader);
-
-                                // trigger leader election here
-                                election.initiate();
-                            }
-
+                            checkForLeaderResponse(notResponding);
                         }
                     }
                 }, TIMEOUT
         );
 
+    }
+
+    /**
+     * Check to see if election needs to be initiated, and do if so if required
+     *
+     * @param notResponding
+     *          the members who are not responding
+     */
+    private void checkForLeaderResponse(List<Member> notResponding)
+    {
+        // see if any of the non-responsive previous members was the leader/coordinator
+        List<Member> anyLeader = notResponding.stream()
+                .filter(member -> member instanceof Leader)
+                .collect(Collectors.toList());
+
+        // if any leader is not responsive wait to ensure update members has been sent
+        if (!anyLeader.isEmpty())
+        {
+            new Timer().schedule(
+                    new TimerTask()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            LOG.debug("Leader not responding: " + anyLeader);
+                            LOG.debug("Waiting to ensure update members sent to all nodes");
+
+                            // trigger leader election here
+                            election.initiate();
+                        }
+                    }, SHORT_TIMEOUT
+            );
+        }
     }
 }

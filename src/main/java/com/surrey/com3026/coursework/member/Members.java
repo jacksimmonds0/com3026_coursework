@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,19 +25,8 @@ public class Members
     public Members()
     {
         super();
-        this.members = new ArrayList<>();
-    }
-
-    /**
-     * Construct a members object with an existing list of members
-     *
-     * @param members
-     *          the list of members
-     */
-    public Members(List<Member> members)
-    {
-        super();
-        this.members = members;
+        // ensure list is synchronised as the Members object will be accessed by multiple threads
+        this.members = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
@@ -45,7 +35,7 @@ public class Members
      * @param member
      *          the member to add
      */
-    public void addMember(Member member)
+    public synchronized void addMember(Member member)
     {
         // prevent duplicates
         if (!members.contains(member))
@@ -57,7 +47,7 @@ public class Members
     /**
      * @return the current list of members
      */
-    public List<Member> getMembers()
+    public synchronized List<Member> getMembers()
     {
         return members;
     }
@@ -66,7 +56,7 @@ public class Members
      * @param members
      *          the current members to set to
      */
-    public void setMembers(List<Member> members)
+    public synchronized void setMembers(List<Member> members)
     {
         this.members = members;
     }
@@ -77,7 +67,7 @@ public class Members
      * @param membersToRemove
      *          the list to remove
      */
-    public void removeMembers(List<Member> membersToRemove)
+    public synchronized void removeMembers(List<Member> membersToRemove)
     {
         for(Member member : membersToRemove)
         {
@@ -93,7 +83,7 @@ public class Members
      * @param replacer
      *          the member to replace the previous member with
      */
-    public void replaceMember(int index, Member replacer)
+    public synchronized void replaceMember(int index, Member replacer)
     {
         members.set(index, replacer);
     }

@@ -34,7 +34,7 @@ public class Security_IT extends AbstractNodeTester
         Thread.sleep(TIMEOUT);
 
         // sending the correct message so response should be received containing message
-        sendSecurityCheckMessage(8002, false, getTesterSignatureHandler(20));
+        sendSecurityCheckMessage(8002, false, getTesterSignatureHandler(TESTER_ID));
 
         Message message = null;
         try
@@ -48,7 +48,7 @@ public class Security_IT extends AbstractNodeTester
         }
         catch (IOException | JAXBException e)
         {
-           fail();
+            fail();
         }
 
         List<Member> expected = Arrays.asList(
@@ -72,7 +72,7 @@ public class Security_IT extends AbstractNodeTester
         Thread.sleep(TIMEOUT);
 
         // set message change to true for integrity check
-        sendSecurityCheckMessage(8002, true, getTesterSignatureHandler(20));
+        sendSecurityCheckMessage(8002, true, getTesterSignatureHandler(TESTER_ID));
 
         // no response expected due to integrity failure on receiver node
         if (responseReceived())
@@ -80,7 +80,6 @@ public class Security_IT extends AbstractNodeTester
             fail();
         }
     }
-
 
     @Test
     public void test_no_response_when_signature_using_wrong_key() throws InterruptedException
@@ -153,8 +152,7 @@ public class Security_IT extends AbstractNodeTester
     {
         try
         {
-            int id = 20;
-            Member tester = new Member(id, 8999);
+            Member tester = new Member(TESTER_ID, 8999);
             Message message = new Message(MessageTypes.GET_INFO, tester);
 
             if (changeMessage)

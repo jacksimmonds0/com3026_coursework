@@ -19,6 +19,7 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -35,17 +36,29 @@ public abstract class AbstractNodeTester
 {
     protected static final int TIMEOUT = 5000;
 
+    /** Longer timeout required for elections as need to wait for messages from election_initiate */
+    protected static final int ELECTION_TIMEOUT = 15000;
+
+    protected static final int TESTER_ID = 20;
+
     private List<Node> nodesInUse;
 
     protected DatagramSocket socket;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp() throws SocketException
     {
         this.nodesInUse = new ArrayList<>();
         this.socket = new DatagramSocket(8999);
     }
 
+    /**
+     * Create a node based on the arguments
+     *
+     * @param args
+     *          the varargs for the node, 2 or 3 otherwise IllegalArgumentExeption is thrown (test fails)
+     * @return the created {@link Node}
+     */
     protected Node createNode(String... args)
     {
         Node node = null;
@@ -65,6 +78,13 @@ public abstract class AbstractNodeTester
         return node;
     }
 
+    /**
+     * Start all threads from the nodes parameter
+     *
+     * @param nodes
+     *          all the nodes to start thread on
+     * @throws InterruptedException when starting the node
+     */
     protected void startThreads(Node... nodes) throws InterruptedException
     {
         for(Node n : nodes)
@@ -73,10 +93,17 @@ public abstract class AbstractNodeTester
             Thread t = createJoinGroupThread(n);
 
             t.start();
-            Thread.sleep(500);
+            Thread.sleep(1000);
         }
     }
 
+    /**
+     * Create a join group thread
+     *
+     * @param node
+     *          the node to create a thread from
+     * @return the {@link Thread} for the node to be started
+     */
     protected Thread createJoinGroupThread(Node node)
     {
         return new Thread(new Runnable()
@@ -89,6 +116,13 @@ public abstract class AbstractNodeTester
         });
     }
 
+    /**
+     * Using helper method to get the nodes current list of members for testing
+     *
+     * @param port
+     *          the port to send to
+     * @return the {@link Message} received from the node
+     */
     protected Message getInfoFromNode(int port)
     {
         Message message = null;
@@ -97,9 +131,8 @@ public abstract class AbstractNodeTester
             byte[] buffer = new byte[1024];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-            int id = 20;
-            Member tester = new Member(id, 8999);
-            SignatureHandler signatureHandler = new SignatureHandler(getTesterKeyStore(id));
+            Member tester = new Member(TESTER_ID, 8999);
+            SignatureHandler signatureHandler = new SignatureHandler(getTesterKeyStore(TESTER_ID));
 
             GetInfoHelper sender = new GetInfoHelper(InetAddress.getByName("127.0.0.1"), port, tester, socket,
                     signatureHandler);

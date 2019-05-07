@@ -84,7 +84,7 @@ public class Node
         Members members = new Members();
         members.addMember(thisNode);
 
-        LOG.debug("Node has been started");
+        LOG.debug("Node " + thisNode.getId() + " has been started");
 
         try
         {
