@@ -9,6 +9,9 @@ import com.surrey.com3026.coursework.security.SignatureHandler;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * Sends the list of all the current members, as a response to the member who has just sent a join request
+ */
 public class SendAllCurrentMembers extends AbstractMessageSender implements Runnable
 {
 

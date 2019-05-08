@@ -198,17 +198,20 @@ public class MessageConsumer implements Runnable
         }
     }
 
-
-    public void setThisNode(Member thisNode)
-    {
-        this.thisNode = thisNode;
-    }
-
+    /**
+     * @return the {@link List} of {@link Member}s who this node needs to check accepted it as a joiner
+     */
     public List<Member> getMembersToCheckAccepted()
     {
         return membersToCheckAccepted;
     }
 
+    /**
+     * Set the members to check accepted the new joiner request
+     *
+     * @param membersToCheckAccepted
+     *          the {@link List} of {@link Member}s to check
+     */
     public void setMembersToCheckAccepted(List<Member> membersToCheckAccepted)
     {
         this.membersToCheckAccepted = membersToCheckAccepted;

@@ -13,6 +13,9 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Thread to send a new joiner request to all other current members (other than the initial responder)
+ */
 public class NewJoiner extends AbstractMessageSender implements Runnable
 {
     private Member responder;

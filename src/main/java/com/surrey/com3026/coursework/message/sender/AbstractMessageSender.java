@@ -76,8 +76,6 @@ public abstract class AbstractMessageSender
      *
      * @param members
      *          the current list of members
-     * @param thisNode
-     *          information on the node this is running on
      * @param address
      *          the {@link InetAddress} to send the message to
      * @param port

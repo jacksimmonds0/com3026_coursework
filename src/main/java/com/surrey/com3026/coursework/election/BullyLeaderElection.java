@@ -10,7 +10,6 @@ import com.surrey.com3026.coursework.security.SignatureHandler;
 import org.apache.log4j.Logger;
 
 import java.net.DatagramSocket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

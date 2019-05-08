@@ -6,12 +6,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.surrey.com3026.coursework.AbstractNodeTester.TIMEOUT;
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 /**

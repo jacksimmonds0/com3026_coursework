@@ -78,7 +78,7 @@ public class LogCheckpoint
     private List<String> loadLogFileToList()
     {
         List<String> array = new ArrayList<>();
-        try(Scanner s = new Scanner(new File(LOG_FILENAME));)
+        try(Scanner s = new Scanner(new File(LOG_FILENAME)))
         {
             while (s.hasNextLine())
             {

@@ -8,6 +8,9 @@ import com.surrey.com3026.coursework.security.SignatureHandler;
 
 import java.net.DatagramSocket;
 
+/**
+ * Send a message to update their current list of members, when this node has discovered that some are not responding
+ */
 public class UpdateMembers extends AbstractMessageSender implements Runnable
 {
 

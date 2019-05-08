@@ -71,7 +71,7 @@ public abstract class AbstractNodeTester
      */
     protected Node createNode(String... args)
     {
-        Node node = null;
+        Node node;
         if(args.length == 2)
         {
             node = new Node(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
@@ -116,14 +116,7 @@ public abstract class AbstractNodeTester
      */
     protected Thread createJoinGroupThread(Node node)
     {
-        return new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                node.startNode();
-            }
-        });
+        return new Thread(node::startNode);
     }
 
     /**
@@ -170,7 +163,7 @@ public abstract class AbstractNodeTester
 
     protected KeyStore getTesterKeyStore(int id)
     {
-        String keyStoreFilename = "node-" + id + ".jks";
+        String keyStoreFilename = "src/test/resources/keystores/node-" + id + ".jks";
         KeyStore keyStore = null;
 
         try (InputStream is = new FileInputStream(keyStoreFilename))

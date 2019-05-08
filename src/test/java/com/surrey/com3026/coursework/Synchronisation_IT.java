@@ -7,9 +7,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-
 /**
  * Test cases ensuring all member nodes are synchronised with the same list of members for the group
  * under a few different circumstances

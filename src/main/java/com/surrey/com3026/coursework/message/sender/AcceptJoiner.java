@@ -9,6 +9,9 @@ import com.surrey.com3026.coursework.security.SignatureHandler;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * Sending an accept joiner message to the member who has joined, to indicate this node is still alive in the group
+ */
 public class AcceptJoiner extends AbstractMessageSender implements Runnable
 {
 

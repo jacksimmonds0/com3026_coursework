@@ -165,7 +165,7 @@ public class Node
      */
     private KeyStore getThisNodesKeyStore()
     {
-        String keyStoreFilename = "node-" + thisNode.getId() + ".jks";
+        String keyStoreFilename = "src/main/resources/keystores/node-" + thisNode.getId() + ".jks";
         KeyStore keyStore = null;
 
         try (InputStream is = new FileInputStream(keyStoreFilename))

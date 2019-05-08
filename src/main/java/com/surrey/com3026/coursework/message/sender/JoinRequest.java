@@ -9,6 +9,9 @@ import com.surrey.com3026.coursework.security.SignatureHandler;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * First message sent to the previous member (info entered at runtime) to get the current list of members
+ */
 public class JoinRequest extends AbstractMessageSender implements Runnable
 {
 

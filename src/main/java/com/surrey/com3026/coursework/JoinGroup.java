@@ -13,7 +13,7 @@ public class JoinGroup
         int portNumber = Integer.parseInt(args[1]);
 
         // instantiate the Node object to start the program
-        Node node = null;
+        Node node;
 
         if(args.length == 2)
         {

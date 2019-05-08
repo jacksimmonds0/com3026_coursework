@@ -6,39 +6,30 @@ import com.surrey.com3026.coursework.member.Members;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test cases to ensure the system can recover from failure - via log checkpoints
  */
 public class Recovery_IT extends AbstractNodeTester
 {
-    private static final String EMPTY_LOG = "empty-" + LOG_FILENAME;
+    private static final String EXAMPLE_LOG = "example-" + LOG_FILENAME;
 
     private static final String XML_LOG_ENTRY = "<?xml";
 
@@ -59,7 +50,7 @@ public class Recovery_IT extends AbstractNodeTester
     @Test
     public void test_no_checkpoints_without_previous_log_file() throws InterruptedException
     {
-        useTestLogFile(EMPTY_LOG);
+        useTestLogFile(EXAMPLE_LOG);
         startLogNodeTest(NO_CHECKPOINT_ENTRY);
     }
 
@@ -69,7 +60,7 @@ public class Recovery_IT extends AbstractNodeTester
         // turn on logging for this test
         Logger.getLogger("com.surrey.com3026.coursework").setLevel(Level.DEBUG);
 
-        useTestLogFile(EMPTY_LOG);
+        useTestLogFile(EXAMPLE_LOG);
 
         // establish initial group
         Node n1 = createNode("1", "8001");
