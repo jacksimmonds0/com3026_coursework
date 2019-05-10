@@ -107,6 +107,17 @@ public abstract class AbstractMessageSender
      */
     protected void sendMessage(InetAddress address, int port, Message message)
     {
+        // increment the timestamp when a message is sent, ensure the message is updated with this
+        thisNode.incrementTimestamp();
+
+        if (members != null)
+        {
+            members.updateMemberTimestamp(thisNode);
+            message.setTimestamps(message.createVectorClockMap(members.getMembers()));
+        }
+
+        LOG.debug("Current vector timestamps: " + message.getTimestamps());
+
         LOG.debug("Sending message to: " + address.getHostAddress() + ":" + port);
         LOG.debug("Message being sent: " + message);
         LOG.debug("Signing the hashed message with private key");

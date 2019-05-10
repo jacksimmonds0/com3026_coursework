@@ -88,6 +88,52 @@ public class Members
         members.set(index, replacer);
     }
 
+    /**
+     * Get a member within the list based on their ID
+     *
+     * @param id
+     *          the ID of the member to find
+     * @return the {@link Member} found, null if none found
+     */
+    public synchronized Member getMemberFromId(int id)
+    {
+        List<Member> foundMember = members.stream()
+                .filter(listMember -> listMember.getId() == id)
+                .collect(Collectors.toList());
+
+        if (foundMember.size() == 1)
+        {
+            return foundMember.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Replace a member in the list with the correct timestamp
+     *
+     * @param replacer
+     *          the member to replace in the list
+     */
+    public void updateMemberTimestamp(Member replacer)
+    {
+        if (members != null)
+        {
+            for (int i = 0; i < members.size(); i++)
+            {
+                Member member = members.get(i);
+
+                if (member.equals(replacer))
+                {
+                    member.setLamportTimestamp(replacer.getLamportTimestamp());
+                    members.set(i, member);
+                }
+            }
+        }
+    }
+
     @Override
     public String toString()
     {

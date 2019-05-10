@@ -39,6 +39,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractNodeTester
 {
+    /** Ensuring the messages have been sent/received by nodes, to simulate it like a real environment */
     protected static final int TIMEOUT = 5000;
 
     /** Longer timeout required for elections as need to wait for messages from election_initiate */
@@ -58,8 +59,11 @@ public abstract class AbstractNodeTester
         this.nodesInUse = new ArrayList<>();
         this.socket = new DatagramSocket(8999);
 
-        // disable logging (unless overridden)
-        Logger.getLogger("com.surrey.com3026.coursework").setLevel(Level.OFF);
+        if (!(this.getClass() == Recovery_IT.class))
+        {
+            // disable logging (unless overridden)
+            Logger.getLogger("com.surrey.com3026.coursework").setLevel(Level.OFF);
+        }
     }
 
     /**
@@ -103,7 +107,7 @@ public abstract class AbstractNodeTester
             Thread t = createJoinGroupThread(n);
 
             t.start();
-            Thread.sleep(1000);
+            Thread.sleep(500);
         }
     }
 
@@ -131,7 +135,7 @@ public abstract class AbstractNodeTester
         Message message = null;
         try
         {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[4096];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
             Member tester = new Member(TESTER_ID, 8999);
@@ -143,11 +147,13 @@ public abstract class AbstractNodeTester
 
             socket.receive(packet);
             String messageReceived = new String(packet.getData(), packet.getOffset(), packet.getLength());
+
             message = unmarshallMessage(messageReceived);
 
         }
         catch (IOException | JAXBException e)
         {
+            System.out.println(e);
             fail();
         }
 

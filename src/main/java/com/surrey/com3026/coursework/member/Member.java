@@ -1,5 +1,7 @@
 package com.surrey.com3026.coursework.member;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -12,6 +14,7 @@ import java.net.UnknownHostException;
  * it can be marshalled/unmarhalled via JAXB
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(Leader.class)
 public class Member
 {
@@ -25,6 +28,9 @@ public class Member
 
     @XmlElement
     protected int portNumber;
+
+    @XmlElement
+    protected int lamportTimestamp;
 
     /**
      * Default constructor for JAXB
@@ -47,6 +53,7 @@ public class Member
         // for the purposes of this implementation, IP address limited to localhost
         this.ipAddress = LOCALHOST;
         this.portNumber = portNumber;
+        this.lamportTimestamp = 0;
     }
 
     /**
@@ -84,12 +91,40 @@ public class Member
         return portNumber;
     }
 
+    /**
+     * @return the logical lamport timestamp for this member object
+     */
+    public int getLamportTimestamp()
+    {
+        return lamportTimestamp;
+    }
+
+    /**
+     * Set the logical lamport timestamp for this node
+     *
+     * @param lamportTimestamp
+     *          the timestamp to be set
+     */
+    public void setLamportTimestamp(int lamportTimestamp)
+    {
+        this.lamportTimestamp = lamportTimestamp;
+    }
+
+    /**
+     * Increment the lamport timestamp
+     */
+    public void incrementTimestamp()
+    {
+        lamportTimestamp++;
+    }
+
     @Override
     public String toString() {
         return "{" +
                  "id=" + id +
                 ", ipAddress=" + ipAddress +
                 ", portNumber=" + portNumber +
+                ", lamportTimestamp=" + lamportTimestamp +
                 '}';
     }
 

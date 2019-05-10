@@ -21,6 +21,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -81,6 +82,16 @@ public class MessageConsumer implements Runnable
             {
                 // take the message from the queue and then apply logic based on the type of message received
                 Message message = (Message) messageQueue.take();
+
+                if (message.getTimestamps() != null)
+                {
+                    // synchronise the timestamps from the message based on the max value
+                    this.synchroniseTimestamps(message.getTimestamps());
+                }
+
+                // increment the Lamport timestamp once a message has been received
+                thisNode.incrementTimestamp();
+                members.updateMemberTimestamp(thisNode);
 
                 // used to check digital signature is correct
                 int responderId = message.getResponder().getId();
@@ -235,6 +246,29 @@ public class MessageConsumer implements Runnable
         catch (JAXBException e)
         {
             LOG.error("Error while marshalling the current members to be log", e);
+        }
+    }
+
+    /**
+     * After receiving a message, need to synchronise the timestamps for all members
+     *
+     * @param timestamps
+     *          the map of timestamps received
+     */
+    private void synchroniseTimestamps(Map<Integer, Integer> timestamps)
+    {
+        for (Integer memberId : timestamps.keySet())
+        {
+            // find the matching member in the current members list from the message list from the ID
+            Member currentMember = members.getMemberFromId(memberId);
+
+            if (currentMember != null)
+            {
+                // set the timestamp to the highest timestamp between the current stored and the message
+                // TS[k] = max(TS[k], MTS[k]) for k = 1 to N
+                int timestamp = Math.max(currentMember.getLamportTimestamp(), timestamps.get(memberId));
+                currentMember.setLamportTimestamp(timestamp);
+            }
         }
     }
 }

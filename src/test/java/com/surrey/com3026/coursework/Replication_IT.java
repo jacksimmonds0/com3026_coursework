@@ -8,10 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Test cases ensuring all member nodes are synchronised with the same list of members for the group
- * under a few different circumstances
+ * Test cases ensuring all member nodes have the replicated list of current members
  */
-public class Synchronisation_IT extends AbstractNodeTester
+public class Replication_IT extends AbstractNodeTester
 {
     @Test
     public void test_all_nodes_have_same_members_list_after_new_joiner() throws InterruptedException
@@ -67,7 +66,7 @@ public class Synchronisation_IT extends AbstractNodeTester
 
 
     @Test
-    public void test_nodes_synchronised_after_multiple_members_failed() throws InterruptedException
+    public void test_nodes_replicated_after_multiple_members_failed() throws InterruptedException
     {
         // establish initial group
         Node n1 = createNode("1", "8001");
