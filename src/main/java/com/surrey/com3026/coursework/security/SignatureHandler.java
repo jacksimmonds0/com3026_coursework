@@ -1,6 +1,5 @@
 package com.surrey.com3026.coursework.security;
 
-import com.surrey.com3026.coursework.security.generator.KeyGenerator;
 import org.apache.log4j.Logger;
 
 import java.security.InvalidKeyException;
@@ -47,8 +46,8 @@ public class SignatureHandler
     {
         try
         {
-            Signature dsa = Signature.getInstance(KeyGenerator.SIG_ALGORITHM, "SUN");
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(KeyGenerator.CERT_CHAIN_ALIAS, KeyGenerator.PASSWORD);
+            Signature dsa = Signature.getInstance(SecurityConstants.SIG_ALGORITHM, SecurityConstants.PROVIDER);
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey(SecurityConstants.CERT_CHAIN_ALIAS, SecurityConstants.PASSWORD);
 
             dsa.initSign(privateKey);
             dsa.update(createMessageDigest(messageToSign));
@@ -79,10 +78,10 @@ public class SignatureHandler
     {
         try
         {
-            Certificate[] chain = keyStore.getCertificateChain(KeyGenerator.CERT_CHAIN_ALIAS);
+            Certificate[] chain = keyStore.getCertificateChain(SecurityConstants.CERT_CHAIN_ALIAS);
             Certificate responderCert = chain[nodeId-1];
 
-            Signature sig = Signature.getInstance(KeyGenerator.SIG_ALGORITHM, "SUN");
+            Signature sig = Signature.getInstance(SecurityConstants.SIG_ALGORITHM, SecurityConstants.PROVIDER);
             sig.initVerify(responderCert);
             sig.update(createMessageDigest(expectedMessage));
 

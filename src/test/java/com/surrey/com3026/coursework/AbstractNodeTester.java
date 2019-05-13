@@ -4,8 +4,8 @@ import com.surrey.com3026.coursework.member.Member;
 import com.surrey.com3026.coursework.message.Message;
 import com.surrey.com3026.coursework.message.MessageTypes;
 import com.surrey.com3026.coursework.message.sender.AbstractMessageSender;
+import com.surrey.com3026.coursework.security.SecurityConstants;
 import com.surrey.com3026.coursework.security.SignatureHandler;
-import com.surrey.com3026.coursework.security.generator.KeyGenerator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -175,7 +175,7 @@ public abstract class AbstractNodeTester
         try (InputStream is = new FileInputStream(keyStoreFilename))
         {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(is, KeyGenerator.PASSWORD);
+            keyStore.load(is, SecurityConstants.PASSWORD);
         }
         catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e)
         {

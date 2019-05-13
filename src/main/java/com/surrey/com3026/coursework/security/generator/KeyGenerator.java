@@ -1,5 +1,6 @@
 package com.surrey.com3026.coursework.security.generator;
 
+import com.surrey.com3026.coursework.security.SecurityConstants;
 import sun.security.tools.keytool.CertAndKeyGen;
 import sun.security.x509.X500Name;
 
@@ -17,14 +18,6 @@ import java.security.cert.X509Certificate;
 
 public class KeyGenerator
 {
-    public static final char[] PASSWORD = "password1".toCharArray();
-
-    public static final String KEY_TYPE = "DSA";
-
-    public static final String SIG_ALGORITHM = "SHA1withDSA";
-
-    public static final String CERT_CHAIN_ALIAS = "group-cert-chain";
-
     private static final long ONE_YEAR = (long) 365 * 24 * 60 * 60;
 
     public static void main(String[] args)
@@ -39,7 +32,7 @@ public class KeyGenerator
             try
             {
                 KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                ks.load(null, PASSWORD);
+                ks.load(null, SecurityConstants.PASSWORD);
                 keyStores[i] = ks;
             }
             catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e)
@@ -57,7 +50,7 @@ public class KeyGenerator
             try (OutputStream fos = new FileOutputStream("node-" + (i+1) + ".jks"))
             {
                 KeyStore ks = keyStores[i];
-                ks.store(fos, PASSWORD);
+                ks.store(fos, SecurityConstants.PASSWORD);
             }
             catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e)
             {
@@ -85,7 +78,7 @@ public class KeyGenerator
             try
             {
                 // generate it with 2048 bits
-                CertAndKeyGen certGen = new CertAndKeyGen(KEY_TYPE, SIG_ALGORITHM);
+                CertAndKeyGen certGen = new CertAndKeyGen(SecurityConstants.KEY_TYPE, SecurityConstants.SIG_ALGORITHM);
                 certGen.generate(2048);
 
                 gens[i] = certGen;
@@ -111,7 +104,8 @@ public class KeyGenerator
 
             try
             {
-                keyStore.setKeyEntry(CERT_CHAIN_ALIAS, certGen.getPrivateKey(), PASSWORD, certificateChain);
+                keyStore.setKeyEntry(SecurityConstants.CERT_CHAIN_ALIAS, certGen.getPrivateKey(),
+                        SecurityConstants.PASSWORD, certificateChain);
             }
             catch (KeyStoreException e)
             {

@@ -11,8 +11,8 @@ import com.surrey.com3026.coursework.message.sender.JoinRequest;
 import com.surrey.com3026.coursework.message.sender.NewJoiner;
 import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 import com.surrey.com3026.coursework.recovery.LogCheckpoint;
+import com.surrey.com3026.coursework.security.SecurityConstants;
 import com.surrey.com3026.coursework.security.SignatureHandler;
-import com.surrey.com3026.coursework.security.generator.KeyGenerator;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -185,7 +185,7 @@ public class Node
         try (InputStream is = new FileInputStream(keyStoreFilename))
         {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(is, KeyGenerator.PASSWORD);
+            keyStore.load(is, SecurityConstants.PASSWORD);
         }
         catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e)
         {
