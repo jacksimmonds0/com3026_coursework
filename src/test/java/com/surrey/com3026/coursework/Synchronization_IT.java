@@ -94,7 +94,7 @@ public class Synchronization_IT extends AbstractNodeTester
             int expectedTimestamp = 6;
             if (port == 8003)
             {
-                // adding +2 to the timestamp expected value due to the get_info message received/sent response
+                // adding +2 to the timestamp expected value due to the get_info message received/sent response on node 3
                 expectedTimestamp += 2;
             }
 
