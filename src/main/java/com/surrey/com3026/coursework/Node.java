@@ -9,6 +9,7 @@ import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.receiver.MessageReceiver;
 import com.surrey.com3026.coursework.message.sender.JoinRequest;
 import com.surrey.com3026.coursework.message.sender.NewJoiner;
+import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 import com.surrey.com3026.coursework.recovery.LogCheckpoint;
 import com.surrey.com3026.coursework.security.SignatureHandler;
 import com.surrey.com3026.coursework.security.generator.KeyGenerator;
@@ -96,14 +97,27 @@ public class Node
             LogCheckpoint checkpoint = new LogCheckpoint(members);
             boolean checkpointFound = checkpoint.getLastMembersFromLogFile();
 
-            if (checkpointFound)
+            if (checkpointFound && !members.getMembers().isEmpty())
             {
-                // send message to everyone indicating the re-joining
-                NewJoiner sender = new NewJoiner(members, thisNode, socket, null, consumer,
-                        election, signatureHandler);
-                new Thread(sender).start();
+                for (Member member : members.getMembers())
+                {
+                    // send to other member in the file, if none
+                    if (!member.equals(thisNode))
+                    {
+                        // send join request to other node recovered from members list
+                        // to receive the current members list
+                        JoinRequest sender = new JoinRequest(members, member.getIp(), member.getPortNumber(), thisNode,
+                                socket, signatureHandler);
+                        new Thread(sender).start();
+
+                        // only return if message sent, otherwise need to perform normal join request
+                        return;
+                    }
+
+                }
             }
-            else if (prevMember != null)
+
+            if (prevMember != null)
             {
                 // use previous member to retrieve all current members list to update
                 String[] prevMemberSplit = prevMember.split(":");
@@ -165,7 +179,7 @@ public class Node
      */
     private KeyStore getThisNodesKeyStore()
     {
-        String keyStoreFilename = "src/main/resources/keystores/node-" + thisNode.getId() + ".jks";
+        String keyStoreFilename = "node-" + thisNode.getId() + ".jks";
         KeyStore keyStore = null;
 
         try (InputStream is = new FileInputStream(keyStoreFilename))
