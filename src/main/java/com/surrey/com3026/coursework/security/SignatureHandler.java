@@ -21,7 +21,7 @@ public class SignatureHandler
 {
     private static final Logger LOG = Logger.getLogger(SignatureHandler.class);
 
-    private static final String SHA_256 = "SHA-256";
+    private static final String SHA_512 = "SHA-512";
 
     private KeyStore keyStore;
 
@@ -105,7 +105,7 @@ public class SignatureHandler
      */
     private byte[] createMessageDigest(byte[] message) throws NoSuchAlgorithmException
     {
-        MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
+        MessageDigest messageDigest = MessageDigest.getInstance(SHA_512);
         return messageDigest.digest(message);
     }
 

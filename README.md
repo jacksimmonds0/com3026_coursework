@@ -43,6 +43,8 @@ And then to create another member who joins by contacting the first member/leade
 ```  
 java JoinGroup 2 8002 127.0.0.1:8001  
 ```  
+Note: extracting the example_workspace file under `src/main/resources` can be used for example runs of the program. 
+Each node running in a different terminal window (after executing the JAR with parameters) will be able to access their own keystore in their folder/working directory and send messages accordingly.
   
   
 ### Integration Tests  

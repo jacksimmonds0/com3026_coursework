@@ -59,7 +59,8 @@ public abstract class AbstractNodeTester
         this.nodesInUse = new ArrayList<>();
         this.socket = new DatagramSocket(8999);
 
-        if (!(this.getClass() == Recovery_IT.class))
+        // only keep enabled on non Recovery_IT classes
+        if (this.getClass() != Recovery_IT.class)
         {
             // disable logging (unless overridden)
             Logger.getLogger("com.surrey.com3026.coursework").setLevel(Level.OFF);
@@ -97,7 +98,7 @@ public abstract class AbstractNodeTester
      *
      * @param nodes
      *          all the nodes to start thread on
-     * @throws InterruptedException when starting the node
+     * @throws InterruptedException when starting the node or on sleeping the thread
      */
     protected void startThreads(Node... nodes) throws InterruptedException
     {

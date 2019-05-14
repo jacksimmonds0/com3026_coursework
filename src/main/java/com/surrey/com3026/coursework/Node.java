@@ -8,8 +8,6 @@ import com.surrey.com3026.coursework.member.Members;
 import com.surrey.com3026.coursework.message.receiver.MessageConsumer;
 import com.surrey.com3026.coursework.message.receiver.MessageReceiver;
 import com.surrey.com3026.coursework.message.sender.JoinRequest;
-import com.surrey.com3026.coursework.message.sender.NewJoiner;
-import com.surrey.com3026.coursework.message.sender.UpdateMembers;
 import com.surrey.com3026.coursework.recovery.LogCheckpoint;
 import com.surrey.com3026.coursework.security.SecurityConstants;
 import com.surrey.com3026.coursework.security.SignatureHandler;
